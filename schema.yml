@@ -1,0 +1,2000 @@
+openapi: 3.0.3
+info:
+  title: Veltrion API
+  version: 1.0.0
+  description: API REST del sistema Veltrion
+paths:
+  /api/v1/auth/login/:
+    post:
+      operationId: v1_auth_login_create
+      description: Autentica un usuario utilizando su nombre de usuario y contraseña.
+        Si las credenciales son válidas, retorna la información del usuario junto
+        con un Access Token y un Refresh Token JWT.
+      summary: Iniciar sesión
+      tags:
+      - Autenticación
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLogin'
+            examples:
+              EjemploDeLogin:
+                value:
+                  username: software_veltrion
+                  password: '12345678'
+                summary: Ejemplo de Login
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthLogin'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthLoginResponse'
+          description: Inicio de sesión exitoso.
+        '400':
+          description: Credenciales inválidas.
+        '401':
+          description: Usuario o contraseña incorrectos.
+  /api/v1/auth/logout/:
+    post:
+      operationId: v1_auth_logout_create
+      description: Invalida el Refresh Token proporcionado.
+      summary: Cerrar sesión
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLogout'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthLogout'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthLogout'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/me/:
+    get:
+      operationId: v1_auth_me_retrieve
+      description: Retorna la información del usuario autenticado a partir del Access
+        Token enviado en el encabezado Authorization.
+      summary: Obtener usuario autenticado
+      tags:
+      - Autenticación
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthMeResponse'
+          description: Información del usuario autenticado.
+        '401':
+          description: Token inválido o expirado.
+  /api/v1/auth/refresh/:
+    post:
+      operationId: v1_auth_refresh_create
+      description: Genera un nuevo Access Token a partir de un Refresh Token válido.
+      summary: Renovar Access Token
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthRefresh'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthRefreshResponse'
+          description: ''
+  /api/v1/roles/:
+    get:
+      operationId: v1_roles_list
+      description: Obtiene el listado de todos los roles registrados en el sistema.
+      summary: Listar roles
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - Roles
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRoleListResponseList'
+          description: Listado de roles.
+    post:
+      operationId: v1_roles_create
+      description: Crea un nuevo rol dentro del sistema.
+      summary: Crear rol
+      tags:
+      - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleCreate'
+            examples:
+              CrearRol:
+                value:
+                  role_name: Administrador
+                  role_description: Control total del sistema
+                  is_active: true
+                summary: Crear Rol
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleCreateResponse'
+          description: Rol creado correctamente.
+        '400':
+          description: Datos inválidos.
+  /api/v1/roles/{id_role}/:
+    get:
+      operationId: v1_roles_retrieve
+      description: Obtiene la información detallada de un rol.
+      summary: Obtener rol
+      parameters:
+      - in: path
+        name: id_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Rol.
+        required: true
+      tags:
+      - Roles
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDetailResponse'
+          description: Información del rol.
+        '404':
+          description: Rol no encontrado.
+    put:
+      operationId: v1_roles_update
+      description: Actualiza completamente un rol.
+      summary: Actualizar rol
+      parameters:
+      - in: path
+        name: id_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Rol.
+        required: true
+      tags:
+      - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleUpdateResponse'
+          description: Rol actualizado correctamente.
+    patch:
+      operationId: v1_roles_partial_update
+      description: Actualiza uno o varios campos de un rol.
+      summary: Actualizar parcialmente un rol
+      parameters:
+      - in: path
+        name: id_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Rol.
+        required: true
+      tags:
+      - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRoleUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRoleUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRoleUpdate'
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolePartialUpdateResponse'
+          description: Rol actualizado correctamente.
+    delete:
+      operationId: v1_roles_destroy
+      description: Realiza el borrado lógico del rol.
+      summary: Desactivar rol
+      parameters:
+      - in: path
+        name: id_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Rol.
+        required: true
+      tags:
+      - Roles
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDeleteResponse'
+          description: Rol desactivado correctamente.
+  /api/v1/roles/{id_role}/restore/:
+    post:
+      operationId: v1_roles_restore_create
+      description: Reactiva un rol previamente desactivado.
+      summary: Restaurar rol
+      parameters:
+      - in: path
+        name: id_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Rol.
+        required: true
+      tags:
+      - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleRestoreResponse'
+          description: Rol restaurado correctamente.
+  /api/v1/security/context/:
+    get:
+      operationId: v1_security_context_retrieve
+      description: Retorna roles, permisos efectivos y acciones del usuario autenticado.
+      summary: Obtener contexto de autorización
+      tags:
+      - Seguridad
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityContextResponse'
+          description: Contexto de autorización obtenido correctamente.
+        '401':
+          description: Token inválido o expirado.
+  /api/v1/security/dashboard/:
+    get:
+      operationId: v1_security_dashboard_retrieve
+      description: Retorna los widgets del dashboard según los permisos efectivos
+        del usuario autenticado.
+      summary: Obtener dashboard dinámico
+      tags:
+      - Seguridad
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityDashboardResponse'
+          description: Dashboard obtenido correctamente.
+        '401':
+          description: Token inválido o expirado.
+  /api/v1/security/navigation/:
+    get:
+      operationId: v1_security_navigation_retrieve
+      description: Retorna el árbol de navegación filtrado según los permisos efectivos
+        del usuario autenticado.
+      summary: Obtener navegación dinámica
+      tags:
+      - Seguridad
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityNavigationResponse'
+          description: Navegación obtenida correctamente.
+        '401':
+          description: Token inválido o expirado.
+  /api/v1/user-roles/:
+    get:
+      operationId: v1_user_roles_list
+      description: Obtiene el listado de todas las asignaciones de roles a usuarios.
+      summary: Listar asignaciones de roles
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - User Roles
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserRoleListResponseList'
+          description: Listado de asignaciones de roles.
+    post:
+      operationId: v1_user_roles_create
+      description: Crea una nueva asignación de rol a un usuario.
+      summary: Asignar rol a usuario
+      tags:
+      - User Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRoleCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRoleCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRoleCreateResponse'
+          description: Asignación creada correctamente.
+        '400':
+          description: Datos inválidos.
+  /api/v1/user-roles/{id_user_role}/:
+    get:
+      operationId: v1_user_roles_retrieve
+      description: Obtiene la información detallada de una asignación de rol.
+      summary: Obtener asignación de rol
+      parameters:
+      - in: path
+        name: id_user_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Asignación de Rol.
+        required: true
+      tags:
+      - User Roles
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRoleDetailResponse'
+          description: Información de la asignación.
+        '404':
+          description: Asignación no encontrada.
+    put:
+      operationId: v1_user_roles_update
+      description: Actualiza completamente una asignación de rol.
+      summary: Actualizar asignación
+      parameters:
+      - in: path
+        name: id_user_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Asignación de Rol.
+        required: true
+      tags:
+      - User Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRoleUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRoleUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRoleUpdateResponse'
+          description: Asignación actualizada correctamente.
+    patch:
+      operationId: v1_user_roles_partial_update
+      description: Actualiza uno o varios campos de una asignación.
+      summary: Actualizar parcialmente una asignación
+      parameters:
+      - in: path
+        name: id_user_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Asignación de Rol.
+        required: true
+      tags:
+      - User Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRoleUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRoleUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRoleUpdate'
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRolePartialUpdateResponse'
+          description: Asignación actualizada correctamente.
+    delete:
+      operationId: v1_user_roles_destroy
+      description: Realiza el borrado lógico de la asignación.
+      summary: Desactivar asignación
+      parameters:
+      - in: path
+        name: id_user_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Asignación de Rol.
+        required: true
+      tags:
+      - User Roles
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRoleDeleteResponse'
+          description: Asignación desactivada correctamente.
+  /api/v1/user-roles/{id_user_role}/restore/:
+    post:
+      operationId: v1_user_roles_restore_create
+      description: Reactiva una asignación previamente desactivada.
+      summary: Restaurar asignación
+      parameters:
+      - in: path
+        name: id_user_role
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Asignación de Rol.
+        required: true
+      tags:
+      - User Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRoleDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRoleDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRoleRestoreResponse'
+          description: Asignación restaurada correctamente.
+  /api/v1/users/:
+    get:
+      operationId: v1_users_list
+      description: Obtiene el listado de todos los usuarios registrados en el sistema.
+      summary: Listar usuarios
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - Usuarios
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserListResponseList'
+          description: Listado de usuarios.
+    post:
+      operationId: v1_users_create
+      description: Crea un nuevo usuario dentro del sistema.
+      summary: Crear usuario
+      tags:
+      - Usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+            examples:
+              CrearUsuario:
+                value:
+                  username: juanperez
+                  password: Admin123*
+                  first_name: Juan
+                  last_name: Pérez
+                  email: juan@gmail.com
+                  document_number: '123456789'
+                  phone_number: '3001234567'
+                summary: Crear Usuario
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreateResponse'
+          description: Usuario creado correctamente.
+        '400':
+          description: Datos invalidos.
+  /api/v1/users/{id_user}/:
+    get:
+      operationId: v1_users_retrieve
+      description: Obtiene toda la informacion de un usuario especifico.
+      summary: Obtener usuario
+      parameters:
+      - in: path
+        name: id_user
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Usuarios
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailResponse'
+          description: Informacion del usuario.
+        '404':
+          description: Usuario no encontrado.
+    put:
+      operationId: v1_users_update
+      description: Actualiza completamente un usuario.
+      summary: Actualizar usuario
+      parameters:
+      - in: path
+        name: id_user
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdateResponse'
+          description: Usuario actualizado correctamente.
+    patch:
+      operationId: v1_users_partial_update
+      description: Actualiza uno o varios campos del usuario.
+      summary: Actualizar parcialmente un usuario
+      parameters:
+      - in: path
+        name: id_user
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserUpdate'
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPartialUpdateResponse'
+          description: Usuario actualizado correctamente.
+    delete:
+      operationId: v1_users_destroy
+      description: Realiza el borrado lógico del usuario. No elimina físicamente el
+        registro.
+      summary: Desactivar usuario
+      parameters:
+      - in: path
+        name: id_user
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Usuarios
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDeleteResponse'
+          description: Usuario desactivado correctamente.
+  /api/v1/users/{id_user}/restore/:
+    post:
+      operationId: v1_users_restore_create
+      description: Reactiva un usuario previamente desactivado.
+      summary: Restaurar usuario
+      parameters:
+      - in: path
+        name: id_user
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRestoreResponse'
+          description: Usuario restaurado correctamente.
+components:
+  schemas:
+    AuthLogin:
+      type: object
+      description: Serializer para validar las credenciales de inicio de sesión.
+      properties:
+        username:
+          type: string
+          description: Nombre de usuario.
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          description: Contraseña del usuario.
+      required:
+      - password
+      - username
+    AuthLoginResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LoginResponse'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    AuthLogout:
+      type: object
+      description: |-
+        Serializer para el cierre de sesión.
+
+        Valida que se proporcione el Refresh Token para invalidarlo.
+      properties:
+        refresh:
+          type: string
+      required:
+      - refresh
+    AuthMeResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AuthMeResponse'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    AuthRefresh:
+      type: object
+      description: |-
+        Serializer encargado de validar el Refresh Token recibido
+        para generar un nuevo Access Token.
+      properties:
+        refresh:
+          type: string
+          description: Refresh Token del usuario.
+      required:
+      - refresh
+    AuthRefreshResponse:
+      type: object
+      description: |-
+        Serializer utilizado para documentar la respuesta
+        del endpoint de renovación de tokens.
+      properties:
+        access:
+          type: string
+          description: Nuevo Access Token.
+      required:
+      - access
+    DashboardResponse:
+      type: object
+      description: |-
+        Serializer de respuesta del endpoint ``GET /security/dashboard``.
+
+        Serializa únicamente la configuración de widgets del dashboard.
+      properties:
+        widgets:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - widgets
+    LoginResponse:
+      type: object
+      description: |-
+        Serializer de respuesta del login.
+
+        Serializa únicamente usuario y tokens JWT.
+      properties:
+        user:
+          allOf:
+          - $ref: '#/components/schemas/UserDetail'
+          readOnly: true
+        access_token:
+          type: string
+          readOnly: true
+        refresh_token:
+          type: string
+          readOnly: true
+      required:
+      - access_token
+      - refresh_token
+      - user
+    PaginatedRoleListResponseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleListResponse'
+    PaginatedUserListResponseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserListResponse'
+    PaginatedUserRoleListResponseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRoleListResponse'
+    PatchedRoleUpdate:
+      type: object
+      description: Serializer utilizado para actualizar un rol existente.
+      properties:
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          title: Fecha de eliminación
+        role_name:
+          type: string
+          title: Nombre del rol
+          description: Nombre único del rol.
+          maxLength: 100
+        role_description:
+          type: string
+          nullable: true
+          title: Descripción
+        permissions:
+          title: Permisos dinámicos
+          description: 'Diccionario JSON con los permisos del rol. Ejemplo: {"users.view":
+            true, "sales.create": false}'
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el registro está activo.
+    PatchedUserRoleUpdate:
+      type: object
+      description: |-
+        Serializer para actualizar
+        asignaciones de roles.
+      properties:
+        user:
+          type: integer
+          title: Usuario
+          description: Usuario al que pertenece el rol.
+        role:
+          type: integer
+          title: Rol
+          description: Rol asignado al usuario.
+    PatchedUserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        phone_number:
+          type: string
+          nullable: true
+          title: Teléfono
+          description: Número telefónico del usuario.
+          maxLength: 20
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+    RoleCreate:
+      type: object
+      description: Serializer utilizado para crear un nuevo rol.
+      properties:
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          title: Fecha de eliminación
+        role_name:
+          type: string
+          title: Nombre del rol
+          description: Nombre único del rol.
+          maxLength: 100
+        role_description:
+          type: string
+          nullable: true
+          title: Descripción
+        permissions:
+          title: Permisos dinámicos
+          description: 'Diccionario JSON con los permisos del rol. Ejemplo: {"users.view":
+            true, "sales.create": false}'
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el registro está activo.
+      required:
+      - role_name
+    RoleCreateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    RoleDeleteResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    RoleDetail:
+      type: object
+      description: Serializer para visualizar el detalle completo de un rol.
+      properties:
+        id_role:
+          type: integer
+          readOnly: true
+          title: ID
+        role_name:
+          type: string
+          title: Nombre del rol
+          description: Nombre único del rol.
+          maxLength: 100
+        role_description:
+          type: string
+          nullable: true
+          title: Descripción
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el registro está activo.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de actualización
+      required:
+      - created_at
+      - id_role
+      - role_name
+      - updated_at
+    RoleDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    RoleList:
+      type: object
+      description: Serializer para listar los roles del sistema.
+      properties:
+        id_role:
+          type: integer
+          readOnly: true
+          title: ID
+        role_name:
+          type: string
+          readOnly: true
+          title: Nombre del rol
+          description: Nombre único del rol.
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Estado
+          description: Indica si el registro está activo.
+      required:
+      - id_role
+      - is_active
+      - role_name
+    RoleListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleList'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    RolePartialUpdateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    RoleRestoreResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    RoleUpdate:
+      type: object
+      description: Serializer utilizado para actualizar un rol existente.
+      properties:
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          title: Fecha de eliminación
+        role_name:
+          type: string
+          title: Nombre del rol
+          description: Nombre único del rol.
+          maxLength: 100
+        role_description:
+          type: string
+          nullable: true
+          title: Descripción
+        permissions:
+          title: Permisos dinámicos
+          description: 'Diccionario JSON con los permisos del rol. Ejemplo: {"users.view":
+            true, "sales.create": false}'
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el registro está activo.
+      required:
+      - role_name
+    RoleUpdateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    SecurityContextResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SecurityContextResponse'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    SecurityDashboardResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DashboardResponse'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    SecurityNavigationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+    UserCreate:
+      type: object
+      properties:
+        username:
+          type: string
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        document_number:
+          type: string
+          title: Número de documento
+          description: Número de documento de identidad del usuario.
+          maxLength: 50
+        phone_number:
+          type: string
+          nullable: true
+          title: Teléfono
+          description: Número telefónico del usuario.
+          maxLength: 20
+      required:
+      - document_number
+      - email
+      - password
+      - username
+    UserCreateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserDeleteResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserDetail:
+      type: object
+      properties:
+        id_user:
+          type: integer
+          readOnly: true
+          title: ID
+        username:
+          type: string
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        document_number:
+          type: string
+          title: Número de documento
+          description: Número de documento de identidad del usuario.
+          pattern: ^[0-9]+$
+          maxLength: 50
+        phone_number:
+          type: string
+          nullable: true
+          title: Teléfono
+          description: Número telefónico del usuario.
+          maxLength: 20
+        roles:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de actualización
+      required:
+      - created_at
+      - document_number
+      - email
+      - id_user
+      - roles
+      - updated_at
+      - username
+    UserDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserList:
+      type: object
+      properties:
+        id_user:
+          type: integer
+          readOnly: true
+          title: ID
+        username:
+          type: string
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        document_number:
+          type: string
+          title: Número de documento
+          description: Número de documento de identidad del usuario.
+          pattern: ^[0-9]+$
+          maxLength: 50
+        roles:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+      required:
+      - document_number
+      - email
+      - id_user
+      - roles
+      - username
+    UserListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserList'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserPartialUpdateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserRestoreResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserRoleCreate:
+      type: object
+      description: Serializer para crear asignaciones de roles.
+      properties:
+        user:
+          type: integer
+          title: Usuario
+          description: Usuario al que pertenece el rol.
+        role:
+          type: integer
+          title: Rol
+          description: Rol asignado al usuario.
+      required:
+      - role
+      - user
+    UserRoleCreateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserRoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserRoleDeleteResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserRoleDetail:
+      type: object
+      description: |-
+        Serializer para visualizar el detalle
+        de una asignacion.
+      properties:
+        id_user_role:
+          type: integer
+          readOnly: true
+          title: ID
+        user:
+          type: integer
+          title: Usuario
+          description: Usuario al que pertenece el rol.
+        username:
+          type: string
+          readOnly: true
+        role:
+          type: integer
+          title: Rol
+          description: Rol asignado al usuario.
+        role_name:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de actualización
+      required:
+      - created_at
+      - id_user_role
+      - role
+      - role_name
+      - updated_at
+      - user
+      - username
+    UserRoleDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserRoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserRoleList:
+      type: object
+      description: Serializer para listar las asignaciones de roles.
+      properties:
+        id_user_role:
+          type: integer
+          readOnly: true
+          title: ID
+        username:
+          type: string
+          readOnly: true
+        role_name:
+          type: string
+          readOnly: true
+      required:
+      - id_user_role
+      - role_name
+      - username
+    UserRoleListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRoleList'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserRolePartialUpdateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserRoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserRoleRestoreResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserRoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserRoleUpdate:
+      type: object
+      description: |-
+        Serializer para actualizar
+        asignaciones de roles.
+      properties:
+        user:
+          type: integer
+          title: Usuario
+          description: Usuario al que pertenece el rol.
+        role:
+          type: integer
+          title: Rol
+          description: Rol asignado al usuario.
+      required:
+      - role
+      - user
+    UserRoleUpdateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserRoleDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+    UserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        phone_number:
+          type: string
+          nullable: true
+          title: Teléfono
+          description: Número telefónico del usuario.
+          maxLength: 20
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+      required:
+      - email
+    UserUpdateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserDetail'
+        success:
+          type: boolean
+          default: true
+        code:
+          type: string
+          default: SUCCESS
+        message:
+          type: string
+          default: Operación exitosa.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - data
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

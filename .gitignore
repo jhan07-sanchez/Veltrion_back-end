@@ -1,0 +1,25 @@
+# Entorno virtual
+venv/
+
+# Variables de entorno
+.env
+
+# Archivos compilados
+__pycache__/
+*.pyc
+
+# Base de datos SQLite
+db.sqlite3
+
+# Archivos estáticos compilados
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Cache de Ruff
+.ruff_cache/

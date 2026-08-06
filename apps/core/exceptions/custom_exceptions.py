@@ -1,0 +1,86 @@
+from rest_framework.exceptions import APIException
+
+from apps.core.exceptions.error_codes import ErrorCodes
+
+
+class BusinessException(APIException):
+    """
+    Excepción base para reglas de negocio.
+    """
+
+    status_code = 400
+
+    default_detail = "Ha ocurrido un error."
+
+    default_code = ErrorCodes.VALIDATION_ERROR
+
+
+class UserAlreadyExistsException(BusinessException):
+    default_detail = "El usuario ya existe."
+
+    default_code = ErrorCodes.USER_ALREADY_EXISTS
+
+
+class EmailAlreadyExistsException(BusinessException):
+    default_detail = "El correo electrónico ya existe."
+    default_code = ErrorCodes.EMAIL_ALREADY_EXISTS
+
+
+
+class DocumentAlreadyExistsException(BusinessException):
+    default_detail = "El número de documento ya existe."
+    default_code = ErrorCodes.DOCUMENT_ALREADY_EXISTS
+
+
+
+
+class RoleAlreadyExistsException(BusinessException):
+    default_detail = "El rol ya existe."
+    default_code = ErrorCodes.ROLE_ALREADY_EXISTS
+
+
+class UserInactiveException(BusinessException):
+    default_detail = "El usuario se encuentra inactivo."
+    default_code = ErrorCodes.USER_INACTIVE
+
+
+class RoleInactiveException(BusinessException):
+    default_detail = "El rol se encuentra inactivo."
+    default_code = ErrorCodes.ROLE_INACTIVE
+
+
+class NoActiveRoleException(BusinessException):
+    """Se lanza cuando el usuario no tiene ningún rol activo."""
+
+    default_detail = "El usuario no tiene ningún rol activo asignado."
+    default_code = ErrorCodes.NO_ACTIVE_ROLE
+    status_code = 403
+
+
+class NoPermissionsException(BusinessException):
+    """Se lanza cuando el usuario no posee permisos efectivos."""
+
+    default_detail = "El usuario no posee permisos en el sistema."
+    default_code = ErrorCodes.NO_PERMISSIONS
+    status_code = 403
+
+
+class UserRoleAlreadyExistsException(BusinessException):
+    """
+    Se lanza cuando un usuario ya tiene asignado
+    el mismo rol.
+    """
+    default_detail = "El usuario ya tiene asignado este rol."
+    default_code = ErrorCodes.USER_ROLE_ALREADY_EXISTS
+
+
+class InvalidCredentialsException(BusinessException):
+    default_detail = "Nombre de usuario o contraseña incorrectos."
+    default_code = ErrorCodes.AUTHENTICATION_FAILED
+    status_code = 401
+
+
+class InvalidTokenException(BusinessException):
+    default_detail = "El token es inválido o ha expirado."
+    default_code = ErrorCodes.AUTHENTICATION_FAILED
+    status_code = 401
