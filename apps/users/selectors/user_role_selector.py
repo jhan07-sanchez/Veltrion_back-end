@@ -12,7 +12,7 @@ class UserRoleSelector(BaseSelector[UserRole]):
 
     Los selectors unicamente contienen logica de lectura
     """
-    
+
     def __init__(self):
         super().__init__(UserRole)
 
@@ -21,7 +21,12 @@ class UserRoleSelector(BaseSelector[UserRole]):
         Sobreescribimos get_queryset para asegurar que todas las consultas
         hereden la optimización de select_related y el orden por defecto.
         """
-        return super().get_queryset().select_related("user", "role").order_by("id_user_role")
+        return (
+            super()
+            .get_queryset()
+            .select_related("user", "role")
+            .order_by("id_user_role")
+        )
 
     @staticmethod
     def get_user_roles():
@@ -76,7 +81,11 @@ class UserRoleSelector(BaseSelector[UserRole]):
             kwargs["user_id"] = user
         if role:
             kwargs["role_id"] = role
+        qs = UserRole.all_objects.select_related("user", "role").order_by(
+            "id_user_role"
+        )
+
         if is_active is not None:
-            kwargs["is_active"] = is_active
-            
-        return UserRoleSelector().filter(**kwargs).order_by("-created_at")
+            kwargs["deleted_at__isnull"] = is_active
+
+        return UserRoleSelector().filter(qs=qs, **kwargs).order_by("-created_at")

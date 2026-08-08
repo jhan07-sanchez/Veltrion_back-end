@@ -1,8 +1,9 @@
 from django.contrib.auth.password_validation import validate_password
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-
 from apps.users.models import User
+
 from .role_serializer import RoleListSerializer
 
 
@@ -24,6 +25,7 @@ class UserListSerializer(serializers.ModelSerializer):
             "is_active",
         )
 
+    @extend_schema_field(RoleListSerializer(many=True))
     def get_roles(self, obj):
         """
         Retorna todos los roles asignados al usuario.
@@ -35,6 +37,7 @@ class UserListSerializer(serializers.ModelSerializer):
             roles,
             many=True,
         ).data
+
 
 class UserDetailSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
@@ -56,6 +59,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "updated_at",
         )
 
+    @extend_schema_field(RoleListSerializer(many=True))
     def get_roles(self, obj):
         roles = [ur.role for ur in obj.user_roles.all() if ur.role.is_active]
 
@@ -65,10 +69,13 @@ class UserDetailSerializer(serializers.ModelSerializer):
         ).data
 
 
-#Serializer para crear usuarios
+# Serializer para crear usuarios
 class UserCreateSerializer(serializers.ModelSerializer):
-
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password],)
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password],
+    )
 
     class Meta:
         model = User
@@ -90,10 +97,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
         }
 
 
-
-#Serializer para actualizar usuarios
+# Serializer para actualizar usuarios
 class UserUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
 

@@ -53,11 +53,6 @@ class NavigationBuilder:
 
     @staticmethod
     def build(effective_permissions: dict[str, bool]) -> list[dict]:
-        print("NAV EFFECTIVE PERMISSIONS:", effective_permissions)
-        print(
-            "NAV TYPE:",
-            type(effective_permissions)
-        )
         """
         Construye el árbol de navegación completo.
 
@@ -81,18 +76,13 @@ class NavigationBuilder:
 
         # ── Módulos raíz (sin parent) ─────────────────────────
         root_modules = SecurityRegistry.get_modules_by_parent(None)
-        print("ROOT MODULES:", root_modules)
 
         for module in root_modules:
-            print("MODULE:", module.module_id)
-            print("MODULE PERMISSIONS:", module.permissions, type(module.permissions))
             if NavigationBuilder._user_can_access_module(
                 module.permissions,
                 effective_permissions,
             ):
-                navigation.append(
-                    NavigationBuilder._build_module_node(module)
-                )
+                navigation.append(NavigationBuilder._build_module_node(module))
 
         # ── Grupos con hijos ──────────────────────────────────
         for group in SecurityRegistry.get_all_groups():
@@ -160,9 +150,7 @@ class NavigationBuilder:
                 module.permissions,
                 effective_permissions,
             ):
-                children.append(
-                    NavigationBuilder._build_module_node(module)
-                )
+                children.append(NavigationBuilder._build_module_node(module))
 
         return children
 

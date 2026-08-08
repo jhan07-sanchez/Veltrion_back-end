@@ -4,30 +4,37 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0003_remove_user_role_userrole'),
+        ("users", "0003_remove_user_role_userrole"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='role',
-            name='user_roles_create',
-            field=models.BooleanField(default=False, verbose_name='Asignar roles a usuarios'),
+            model_name="role",
+            name="user_roles_create",
+            field=models.BooleanField(
+                default=False, verbose_name="Asignar roles a usuarios"
+            ),
         ),
         migrations.AddField(
-            model_name='role',
-            name='user_roles_delete',
-            field=models.BooleanField(default=False, verbose_name='Eliminar asignaciones de roles'),
+            model_name="role",
+            name="user_roles_delete",
+            field=models.BooleanField(
+                default=False, verbose_name="Eliminar asignaciones de roles"
+            ),
         ),
         migrations.AddField(
-            model_name='role',
-            name='user_roles_read',
-            field=models.BooleanField(default=False, verbose_name='Consultar asignaciones de roles'),
+            model_name="role",
+            name="user_roles_read",
+            field=models.BooleanField(
+                default=False, verbose_name="Consultar asignaciones de roles"
+            ),
         ),
         migrations.AddField(
-            model_name='role',
-            name='user_roles_update',
-            field=models.BooleanField(default=False, verbose_name='Actualizar asignaciones de roles'),
+            model_name="role",
+            name="user_roles_update",
+            field=models.BooleanField(
+                default=False, verbose_name="Actualizar asignaciones de roles"
+            ),
         ),
     ]

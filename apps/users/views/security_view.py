@@ -11,7 +11,9 @@ from apps.users.docs.security_docs import (
     security_context_schema,
 )
 from apps.users.serializers.auth.dashboard_serializer import DashboardResponseSerializer
-from apps.users.serializers.auth.navigation_serializer import NavigationResponseSerializer
+from apps.users.serializers.auth.navigation_serializer import (
+    NavigationResponseSerializer,
+)
 from apps.users.serializers.auth.security_context_serializer import (
     SecurityContextResponseSerializer,
 )
@@ -62,14 +64,7 @@ class SecurityNavigationView(APIView):
 
         navigation = SecurityService.get_navigation(request.user)
 
-        print("FINAL NAVIGATION:")
-        print(navigation)
-        print(type(navigation))
-        serializer = NavigationResponseSerializer(
-            {
-                "navigation": navigation
-            }
-        )
+        serializer = NavigationResponseSerializer({"navigation": navigation})
 
         return ApiResponse.success(
             message="Navegación obtenida correctamente.",

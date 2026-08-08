@@ -284,9 +284,7 @@ class SecurityRegistry:
         """
 
         with cls._lock:
-            return list(cls._all_permissions.keys()) + list(
-                cls._all_actions.keys()
-            )
+            return list(cls._all_permissions.keys()) + list(cls._all_actions.keys())
 
     @classmethod
     def is_valid_permission(cls, permission_code: str) -> bool:

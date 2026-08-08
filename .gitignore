@@ -23,3 +23,7 @@ staticfiles/
 
 # Cache de Ruff
 .ruff_cache/
+
+# Test databases
+test_db.sqlite3
+*.sqlite3

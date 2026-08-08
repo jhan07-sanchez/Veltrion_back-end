@@ -33,7 +33,6 @@ class BaseViewSet(ModelViewSet):
             status_code=status_code,
         )
 
-
     @staticmethod
     def error_response(
         *,

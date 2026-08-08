@@ -2,8 +2,8 @@ from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.decorators import action
 
-from apps.core.views.base_viewset import BaseViewSet
 from apps.core.security import HasPermission
+from apps.core.views.base_viewset import BaseViewSet
 from apps.users.docs.role_docs import (
     role_create_schema,
     role_delete_schema,

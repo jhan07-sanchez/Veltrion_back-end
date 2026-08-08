@@ -10,12 +10,17 @@ class UserSelector(BaseSelector[User]):
     Capa encargada exclusivamente de consultas
     sobre el modelo User.
     """
-    
+
     def __init__(self):
         super().__init__(User)
 
     def get_queryset(self) -> QuerySet[User]:
-        return super().get_queryset().prefetch_related("user_roles__role").order_by("id_user")
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("user_roles__role")
+            .order_by("id_user")
+        )
 
     @staticmethod
     def get_users():

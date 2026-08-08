@@ -49,10 +49,7 @@ class PermissionService:
         """
 
         if user.is_superuser:
-            return {
-                code: True
-                for code in SecurityRegistry.get_all_security_codes()
-            }
+            return {code: True for code in SecurityRegistry.get_all_security_codes()}
 
         all_codes = SecurityRegistry.get_all_security_codes()
         effective: dict[str, bool] = {code: False for code in all_codes}
@@ -163,8 +160,7 @@ class PermissionService:
         """Devuelve los nombres de los roles activos del usuario."""
 
         return list(
-            user.user_roles
-            .filter(role__is_active=True)
+            user.user_roles.filter(role__is_active=True)
             .select_related("role")
             .values_list("role__role_name", flat=True)
         )
@@ -173,11 +169,7 @@ class PermissionService:
     def has_any_active_role(user: User) -> bool:
         """Verifica que el usuario tiene al menos un rol activo asignado."""
 
-        return (
-            user.user_roles
-            .filter(role__is_active=True)
-            .exists()
-        )
+        return user.user_roles.filter(role__is_active=True).exists()
 
     @staticmethod
     def has_any_permission(

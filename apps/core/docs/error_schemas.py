@@ -8,16 +8,22 @@ class ApiErrorResponseSerializer(BaseApiResponseSerializer):
     """
     Esquema estándar para respuestas de error de la API.
     """
-    success = serializers.BooleanField(default=False, help_text="Siempre es false en caso de error.")
+
+    success = serializers.BooleanField(
+        default=False, help_text="Siempre es false en caso de error."
+    )
     code = serializers.CharField(
-        default="ERROR", help_text="Código del error (ej. NOT_FOUND, PERMISSION_DENIED)."
+        default="ERROR",
+        help_text="Código del error (ej. NOT_FOUND, PERMISSION_DENIED).",
     )
     message = serializers.CharField(
         default="Ha ocurrido un error.", help_text="Mensaje descriptivo del error."
     )
     data = serializers.DictField(default=None, allow_null=True)
     errors = serializers.DictField(
-        default=None, allow_null=True, help_text="Detalle técnico adicional si está disponible."
+        default=None,
+        allow_null=True,
+        help_text="Detalle técnico adicional si está disponible.",
     )
 
 
@@ -25,6 +31,7 @@ class ValidationErrorResponseSerializer(ApiErrorResponseSerializer):
     """
     Esquema estándar para errores de validación.
     """
+
     code = serializers.CharField(default="VALIDATION_ERROR")
     message = serializers.CharField(default="Error de validación.")
     errors = serializers.DictField(
@@ -35,7 +42,7 @@ class ValidationErrorResponseSerializer(ApiErrorResponseSerializer):
 def standard_error_responses(responses=None):
     """
     Decorador reutilizable para inyectar las respuestas de error estándar.
-    
+
     Args:
         responses (list): Lista de códigos de error HTTP (ej: [400, 401, 403, 404, 500]).
     """

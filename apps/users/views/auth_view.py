@@ -1,15 +1,20 @@
-from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.core.utils.api_response import ApiResponse
-from apps.users.docs.auth_docs import login_schema, me_schema, refresh_schema, logout_schema
+from apps.users.docs.auth_docs import (
+    login_schema,
+    logout_schema,
+    me_schema,
+    refresh_schema,
+)
 from apps.users.serializers.auth.auth_logout_serializer import AuthLogoutSerializer
 from apps.users.serializers.auth.auth_refresh_serializer import AuthRefreshSerializer
 from apps.users.serializers.auth.login_serializer import (
-    LoginResponseSerializer,
     AuthLoginSerializer,
+    LoginResponseSerializer,
 )
 from apps.users.serializers.auth.me_serializer import MeResponseSerializer
 from apps.users.services.auth_service import AuthService
@@ -19,6 +24,8 @@ class AuthLoginView(APIView):
     """Endpoint encargado del inicio de sesión."""
 
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_login"
 
     @login_schema
     def post(self, request):
@@ -66,6 +73,8 @@ class AuthRefreshView(APIView):
     """Endpoint para renovar el Access Token."""
 
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_refresh"
 
     @refresh_schema
     def post(self, request):
@@ -96,6 +105,7 @@ class AuthLogoutView(APIView):
 
         AuthService.logout(
             refresh_token=serializer.validated_data["refresh"],
+            user=request.user,
         )
 
         return ApiResponse.success(
@@ -103,4 +113,3 @@ class AuthLogoutView(APIView):
             code="LOGOUT_SUCCESS",
             status_code=status.HTTP_200_OK,
         )
-

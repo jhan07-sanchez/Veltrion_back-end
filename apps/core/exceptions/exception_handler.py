@@ -1,4 +1,7 @@
+import logging
+
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.http import Http404
 from rest_framework import status
 from rest_framework.exceptions import (
     AuthenticationFailed,
@@ -7,12 +10,13 @@ from rest_framework.exceptions import (
     PermissionDenied,
     ValidationError,
 )
-from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
 from apps.core.exceptions.custom_exceptions import BusinessException
 from apps.core.exceptions.error_codes import ErrorCodes
+
+logger = logging.getLogger(__name__)
 
 
 def custom_exception_handler(exc, context):
@@ -42,13 +46,14 @@ def custom_exception_handler(exc, context):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        logger.error(f"Error interno: {exc}", exc_info=True)
         return Response(
             {
                 "success": False,
                 "code": ErrorCodes.INTERNAL_SERVER_ERROR,
-                "message": "Ha ocurrido un error interno.",
+                "message": "Ha ocurrido un error interno en el servidor.",
                 "data": None,
-                "errors": str(exc),
+                "errors": None,
             },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

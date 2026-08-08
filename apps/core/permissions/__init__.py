@@ -1,5 +1,4 @@
 from .base_permission import BaseRolePermission
-
 from .user_permissions import (
     HasUsersCreatePermission,
     HasUsersDeletePermission,

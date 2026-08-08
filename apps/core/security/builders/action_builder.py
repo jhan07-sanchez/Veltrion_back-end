@@ -2,7 +2,7 @@
 Veltrion Action Builder
 =======================
 
-Agrupa las acciones efectivas del usuario por módulo para 
+Agrupa las acciones efectivas del usuario por módulo para
 facilitar su consumo desde el frontend.
 """
 
@@ -24,7 +24,7 @@ class ActionBuilder:
         Agrupa las acciones efectivas por módulo.
 
         Args:
-            effective_permissions: 
+            effective_permissions:
                 Diccionario plano con todos los códigos de seguridad
                 evaluados (ej. {"users.view": True, "users.export": False}).
 
@@ -54,7 +54,7 @@ class ActionBuilder:
 
                 if module_name not in grouped_actions:
                     grouped_actions[module_name] = {}
-                
+
                 grouped_actions[module_name][action_name] = has_access
 
         return grouped_actions

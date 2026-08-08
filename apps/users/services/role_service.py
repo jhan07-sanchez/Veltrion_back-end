@@ -12,10 +12,10 @@ class RoleService(BaseService[Role]):
     """
     Servicio encargado de la lógica de negocio relacionada con los roles.
     """
-    
+
     def __init__(self):
         super().__init__(Role)
-        
+
     def validate(self, data: dict, instance=None) -> dict:
         role_name = data.get("role_name")
         if instance is None:

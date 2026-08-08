@@ -1,5 +1,5 @@
-from .registry import SecurityRegistry
 from .permissions import HasPermission
+from .registry import SecurityRegistry
 from .services import PermissionService, SecurityService
 
 __all__ = [

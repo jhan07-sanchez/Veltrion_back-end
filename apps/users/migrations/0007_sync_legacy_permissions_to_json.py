@@ -62,7 +62,6 @@ def sync_legacy_booleans_to_permissions_json(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("users", "0006_add_permissions_json_field"),
     ]

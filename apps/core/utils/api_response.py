@@ -15,7 +15,6 @@ class ApiResponse:
         message="Operacion realizada correctamente.",
         status_code=status.HTTP_200_OK,
     ):
-
         """
         Retorna una respuesta exitosa.
         """
@@ -31,7 +30,6 @@ class ApiResponse:
             status=status_code,
         )
 
-
     @staticmethod
     def error(
         message="Ha ocurrido un error.",
@@ -39,7 +37,6 @@ class ApiResponse:
         errors=None,
         status_code=status.HTTP_400_BAD_REQUEST,
     ):
-
         """
         Retorna una respuesta de error.
         """
@@ -52,5 +49,5 @@ class ApiResponse:
                 "data": None,
                 "errors": errors,
             },
-            status=status_code
+            status=status_code,
         )

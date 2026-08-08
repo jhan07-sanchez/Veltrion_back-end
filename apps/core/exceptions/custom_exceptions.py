@@ -26,12 +26,9 @@ class EmailAlreadyExistsException(BusinessException):
     default_code = ErrorCodes.EMAIL_ALREADY_EXISTS
 
 
-
 class DocumentAlreadyExistsException(BusinessException):
     default_detail = "El número de documento ya existe."
     default_code = ErrorCodes.DOCUMENT_ALREADY_EXISTS
-
-
 
 
 class RoleAlreadyExistsException(BusinessException):
@@ -70,6 +67,7 @@ class UserRoleAlreadyExistsException(BusinessException):
     Se lanza cuando un usuario ya tiene asignado
     el mismo rol.
     """
+
     default_detail = "El usuario ya tiene asignado este rol."
     default_code = ErrorCodes.USER_ROLE_ALREADY_EXISTS
 

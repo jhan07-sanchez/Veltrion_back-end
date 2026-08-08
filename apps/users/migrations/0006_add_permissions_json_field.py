@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0005_role_deleted_at_user_deleted_at_userrole_deleted_at'),
+        ("users", "0005_role_deleted_at_user_deleted_at_userrole_deleted_at"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='role',
-            name='permissions',
-            field=models.JSONField(blank=True, default=dict, help_text='Diccionario JSON con los permisos del rol. Ejemplo: {"users.view": true, "sales.create": false}', verbose_name='Permisos dinámicos'),
+            model_name="role",
+            name="permissions",
+            field=models.JSONField(
+                blank=True,
+                default=dict,
+                help_text='Diccionario JSON con los permisos del rol. Ejemplo: {"users.view": true, "sales.create": false}',
+                verbose_name="Permisos dinámicos",
+            ),
         ),
     ]

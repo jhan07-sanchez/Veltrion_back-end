@@ -4,16 +4,16 @@ from drf_spectacular.utils import (
     extend_schema,
 )
 
+from apps.core.docs.api_response_schema import build_api_response_schema
+from apps.core.docs.error_schemas import (
+    ApiErrorResponseSerializer,
+    ValidationErrorResponseSerializer,
+)
 from apps.users.serializers.role_serializer import (
     RoleCreateSerializer,
     RoleDetailSerializer,
     RoleListSerializer,
     RoleUpdateSerializer,
-)
-from apps.core.docs.api_response_schema import build_api_response_schema
-from apps.core.docs.error_schemas import (
-    ApiErrorResponseSerializer,
-    ValidationErrorResponseSerializer,
 )
 
 role_list_schema = extend_schema(
@@ -29,8 +29,12 @@ role_list_schema = extend_schema(
             ),
             description="Listado de roles.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
     },
 )
 
@@ -46,9 +50,15 @@ role_detail_schema = extend_schema(
             ),
             description="Información del rol.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Rol no encontrado."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+        ),
     },
 )
 
@@ -69,8 +79,12 @@ role_create_schema = extend_schema(
             response=ValidationErrorResponseSerializer,
             description="Datos inválidos de validación.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
     },
     examples=[
         OpenApiExample(
@@ -98,10 +112,18 @@ role_update_schema = extend_schema(
             ),
             description="Rol actualizado correctamente.",
         ),
-        400: OpenApiResponse(response=ValidationErrorResponseSerializer, description="Datos inválidos."),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Rol no encontrado."),
+        400: OpenApiResponse(
+            response=ValidationErrorResponseSerializer, description="Datos inválidos."
+        ),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+        ),
     },
 )
 
@@ -118,10 +140,18 @@ role_partial_update_schema = extend_schema(
             ),
             description="Rol actualizado correctamente.",
         ),
-        400: OpenApiResponse(response=ValidationErrorResponseSerializer, description="Datos inválidos."),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Rol no encontrado."),
+        400: OpenApiResponse(
+            response=ValidationErrorResponseSerializer, description="Datos inválidos."
+        ),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+        ),
     },
 )
 
@@ -136,9 +166,15 @@ role_delete_schema = extend_schema(
             ),
             description="Rol desactivado correctamente.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Rol no encontrado."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+        ),
     },
 )
 
@@ -154,8 +190,14 @@ role_restore_schema = extend_schema(
             ),
             description="Rol restaurado correctamente.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Rol no encontrado."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+        ),
     },
 )

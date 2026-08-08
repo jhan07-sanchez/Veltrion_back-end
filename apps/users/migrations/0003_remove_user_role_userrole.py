@@ -6,31 +6,67 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0002_remove_user_profile_photo'),
+        ("users", "0002_remove_user_profile_photo"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='user',
-            name='role',
+            model_name="user",
+            name="role",
         ),
         migrations.CreateModel(
-            name='UserRole',
+            name="UserRole",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Fecha de actualización')),
-                ('id_user_role', models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.ForeignKey(help_text='Rol asignado al usuario.', on_delete=django.db.models.deletion.CASCADE, related_name='user_roles', to='users.role', verbose_name='Rol')),
-                ('user', models.ForeignKey(help_text='Usuario al que pertenece el rol.', on_delete=django.db.models.deletion.CASCADE, related_name='user_roles', to=settings.AUTH_USER_MODEL, verbose_name='Usuario')),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Fecha de creación"
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Fecha de actualización"
+                    ),
+                ),
+                (
+                    "id_user_role",
+                    models.BigAutoField(
+                        primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        help_text="Rol asignado al usuario.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="user_roles",
+                        to="users.role",
+                        verbose_name="Rol",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        help_text="Usuario al que pertenece el rol.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="user_roles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Usuario",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Asignación de Rol',
-                'verbose_name_plural': 'Asignaciones de Roles',
-                'db_table': 'user_roles',
-                'ordering': ['id_user_role'],
-                'constraints': [models.UniqueConstraint(fields=('user', 'role'), name='unique_user_role')],
+                "verbose_name": "Asignación de Rol",
+                "verbose_name_plural": "Asignaciones de Roles",
+                "db_table": "user_roles",
+                "ordering": ["id_user_role"],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("user", "role"), name="unique_user_role"
+                    )
+                ],
             },
         ),
     ]

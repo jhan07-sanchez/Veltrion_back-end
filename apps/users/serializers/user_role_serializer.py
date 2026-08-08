@@ -30,7 +30,6 @@ class UserRoleListSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-
 class UserRoleDetailSerializer(serializers.ModelSerializer):
     """
     Serializer para visualizar el detalle
@@ -46,7 +45,6 @@ class UserRoleDetailSerializer(serializers.ModelSerializer):
         source="role.role_name",
         read_only=True,
     )
-
 
     class Meta:
         model = UserRole
@@ -68,8 +66,6 @@ class UserRoleDetailSerializer(serializers.ModelSerializer):
         )
 
 
-
-
 class UserRoleCreateSerializer(serializers.ModelSerializer):
     """
     Serializer para crear asignaciones de roles.
@@ -82,8 +78,6 @@ class UserRoleCreateSerializer(serializers.ModelSerializer):
             "user",
             "role",
         )
-
-
 
 
 class UserRoleUpdateSerializer(serializers.ModelSerializer):

@@ -5,15 +5,16 @@ from apps.core.docs.error_schemas import (
     ApiErrorResponseSerializer,
     ValidationErrorResponseSerializer,
 )
-from apps.users.serializers.auth.login_serializer import (
-    LoginResponseSerializer,
-    AuthLoginSerializer,
-)
-from apps.users.serializers.auth.me_serializer import MeResponseSerializer
+from apps.users.serializers.auth.auth_logout_serializer import AuthLogoutSerializer
 from apps.users.serializers.auth.auth_refresh_response_serializer import (
     AuthRefreshResponseSerializer,
 )
-
+from apps.users.serializers.auth.auth_refresh_serializer import AuthRefreshSerializer
+from apps.users.serializers.auth.login_serializer import (
+    AuthLoginSerializer,
+    LoginResponseSerializer,
+)
+from apps.users.serializers.auth.me_serializer import MeResponseSerializer
 
 login_schema = extend_schema(
     tags=["Authentication"],
@@ -79,10 +80,11 @@ refresh_schema = extend_schema(
     tags=["Authentication"],
     summary="Renovar Access Token",
     description="Genera un nuevo Access Token a partir de un Refresh Token válido.",
+    request=AuthRefreshSerializer,
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="AuthRefreshResponse",
+                name="AuthRefreshApiResponse",
                 data_serializer=AuthRefreshResponseSerializer,
             ),
             description="Token renovado exitosamente.",
@@ -102,6 +104,7 @@ logout_schema = extend_schema(
     tags=["Authentication"],
     summary="Cerrar sesión",
     description="Invalida el Refresh Token proporcionado.",
+    request=AuthLogoutSerializer,
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(name="AuthLogoutResponse"),

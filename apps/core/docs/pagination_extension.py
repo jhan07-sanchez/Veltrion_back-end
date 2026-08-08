@@ -9,7 +9,7 @@ class CustomPaginationExtension(OpenApiPaginationExtension):
     Extensión para DRF Spectacular para documentar correctamente la
     clase de paginación 'CustomPagination' del proyecto Veltrion.
     """
-    
+
     target_class = "apps.core.pagination.custom_pagination.CustomPagination"
 
     def get_paginated_response_schema(self, schema):
@@ -25,14 +25,16 @@ class CustomPaginationExtension(OpenApiPaginationExtension):
                 "total_pages": serializers.IntegerField(),
                 "page_size": serializers.IntegerField(),
                 "results": schema,
-            }
+            },
         )
-        
+
         # Obtenemos un nombre genérico basado en el modelo paginado (si está disponible en schema)
-        schema_name = getattr(schema, 'name', 'Generic') if hasattr(schema, 'name') else 'Generic'
-        
+        schema_name = (
+            getattr(schema, "name", "Generic") if hasattr(schema, "name") else "Generic"
+        )
+
         return build_api_response_schema(
             name=f"Paginated{schema_name}Response",
             data_serializer=PaginationDataSerializer,
-            description="Respuesta paginada estándar."
+            description="Respuesta paginada estándar.",
         )

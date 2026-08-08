@@ -1,7 +1,7 @@
 from datetime import timedelta
 from pathlib import Path
 
-from decouple import config, Csv
+from decouple import Csv, config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -35,7 +35,6 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-
 
 
 MIDDLEWARE = [
@@ -122,14 +121,21 @@ REST_FRAMEWORK = {
     # Permisos por defecto
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     # Paginación
-    "DEFAULT_PAGINATION_CLASS":
-        "apps.core.pagination.custom_pagination.CustomPagination",
+    "DEFAULT_PAGINATION_CLASS": "apps.core.pagination.custom_pagination.CustomPagination",
     "PAGE_SIZE": 10,
     # Esquema OpenAPI
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Renderizamos únicamente JSON
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "EXCEPTION_HANDLER": "apps.core.exceptions.exception_handler.custom_exception_handler",
+    # Throttling
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "auth_login": "5/minute",
+        "auth_refresh": "10/minute",
+    },
 }
 
 
@@ -154,7 +160,6 @@ SPECTACULAR_SETTINGS = {
         "url": "",
         "email": "jhansancheza@gmail.com",
     },
-    
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     # Habilita el preprocesamiento de enums para componentes limpios
@@ -172,8 +177,7 @@ SPECTACULAR_SETTINGS = {
     },
     "SECURITY": [{"jwtAuth": []}],
     # Agrupación y metadata extendida de ReDoc
-    "EXTENSIONS_INFO": {
-    },
+    "EXTENSIONS_INFO": {},
     "TAGS": [
         {
             "name": "Authentication",
@@ -217,9 +221,9 @@ SPECTACULAR_SETTINGS = {
     ],
 }
 
-#=======================================
+# =======================================
 # Simple jwt
-#=======================================
+# =======================================
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),

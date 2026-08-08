@@ -1,0 +1,9 @@
+[lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+exclude = ["**/migrations/**", "venv", ".venv", "__pycache__", "manage.py"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

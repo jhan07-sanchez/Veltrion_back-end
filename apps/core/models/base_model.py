@@ -6,6 +6,7 @@ class BaseManager(models.Manager):
     """
     Manager base que filtra los registros eliminados lógicamente.
     """
+
     def get_queryset(self):
         return super().get_queryset().filter(deleted_at__isnull=True)
 
@@ -45,11 +46,11 @@ class BaseModel(models.Model):
         Sobrescribe el método delete para realizar un borrado lógico (Soft Delete).
         """
         self.deleted_at = timezone.now()
-        self.save(update_fields=['deleted_at'])
+        self.save(update_fields=["deleted_at"])
 
     def restore(self):
         """
         Restaura un registro eliminado lógicamente.
         """
         self.deleted_at = None
-        self.save(update_fields=['deleted_at'])
+        self.save(update_fields=["deleted_at"])

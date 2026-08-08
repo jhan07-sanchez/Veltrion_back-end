@@ -11,7 +11,7 @@ class RoleSelector(BaseSelector[Role]):
     Los Selectors unicamente contienen logica de lectura.
     No deben crear, actualizar ni eliminar registros.
     """
-    
+
     def __init__(self):
         super().__init__(Role)
 

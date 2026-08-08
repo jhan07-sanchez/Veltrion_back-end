@@ -1,19 +1,23 @@
-from typing import TypeVar, Generic, Any, Optional
+from typing import Any, Generic, Optional, TypeVar
+
 from django.db import models, transaction
 
 # Definimos una variable de tipo que debe ser un Modelo de Django
-ModelType = TypeVar('ModelType', bound=models.Model)
+ModelType = TypeVar("ModelType", bound=models.Model)
+
 
 class BaseService(Generic[ModelType]):
     """
-    Servicio base genérico que encapsula la lógica de negocio y las mutaciones 
+    Servicio base genérico que encapsula la lógica de negocio y las mutaciones
     de datos (Creación, Actualización, Eliminación).
     """
-    
+
     def __init__(self, model: type[ModelType]):
         self.model = model
 
-    def validate(self, data: dict[str, Any], instance: Optional[ModelType] = None) -> dict[str, Any]:
+    def validate(
+        self, data: dict[str, Any], instance: Optional[ModelType] = None
+    ) -> dict[str, Any]:
         """
         Hook para aplicar reglas de negocio ANTES de modificar la BD.
         Si la validación falla, se debe levantar una ValidationError.
@@ -33,9 +37,9 @@ class BaseService(Generic[ModelType]):
 
     def perform_delete(self, instance: ModelType, soft_delete: bool = True) -> None:
         """Hook opcional para definir el comportamiento exacto al borrar."""
-        if soft_delete and hasattr(instance, 'is_active'):
+        if soft_delete and hasattr(instance, "is_active"):
             instance.is_active = False
-            instance.save(update_fields=['is_active'])
+            instance.save(update_fields=["is_active"])
         else:
             instance.delete()
 
@@ -64,13 +68,13 @@ class BaseService(Generic[ModelType]):
         soporta el atributo `is_active`.
         """
         self.perform_delete(instance, soft_delete=soft_delete)
-        
+
     @transaction.atomic
     def restore(self, instance: ModelType) -> ModelType:
         """
         Restaura un registro eliminado si este utilizaba soft delete.
         """
-        if hasattr(instance, 'is_active') and not instance.is_active:
+        if hasattr(instance, "is_active") and not instance.is_active:
             instance.is_active = True
-            instance.save(update_fields=['is_active'])
+            instance.save(update_fields=["is_active"])
         return instance

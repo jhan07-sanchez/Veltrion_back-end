@@ -10,97 +10,408 @@ import apps.users.managers
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Role',
+            name="Role",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Fecha de actualización')),
-                ('id_role', models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID')),
-                ('role_name', models.CharField(help_text='Nombre único del rol.', max_length=100, unique=True, verbose_name='Nombre del rol')),
-                ('role_description', models.TextField(blank=True, null=True, verbose_name='Descripción')),
-                ('users_create', models.BooleanField(default=False, verbose_name='Crear usuarios')),
-                ('users_read', models.BooleanField(default=False, verbose_name='Listar usuarios')),
-                ('users_update', models.BooleanField(default=False, verbose_name='Actualizar usuarios')),
-                ('users_delete', models.BooleanField(default=False, verbose_name='Eliminar usuarios')),
-                ('customers_create', models.BooleanField(default=False, verbose_name='Crear clientes')),
-                ('customers_read', models.BooleanField(default=False, verbose_name='Listar clientes')),
-                ('customers_update', models.BooleanField(default=False, verbose_name='Actualizar clientes')),
-                ('customers_delete', models.BooleanField(default=False, verbose_name='Eliminar clientes')),
-                ('suppliers_create', models.BooleanField(default=False, verbose_name='Crear proveedores')),
-                ('suppliers_read', models.BooleanField(default=False, verbose_name='Listar proveedores')),
-                ('suppliers_update', models.BooleanField(default=False, verbose_name='Actualizar proveedores')),
-                ('suppliers_delete', models.BooleanField(default=False, verbose_name='Eliminar proveedores')),
-                ('categories_create', models.BooleanField(default=False, verbose_name='Crear categorías')),
-                ('categories_read', models.BooleanField(default=False, verbose_name='Listar categorías')),
-                ('categories_update', models.BooleanField(default=False, verbose_name='Actualizar categorías')),
-                ('categories_delete', models.BooleanField(default=False, verbose_name='Eliminar categorías')),
-                ('products_create', models.BooleanField(default=False, verbose_name='Crear productos')),
-                ('products_read', models.BooleanField(default=False, verbose_name='Listar productos')),
-                ('products_update', models.BooleanField(default=False, verbose_name='Actualizar productos')),
-                ('products_delete', models.BooleanField(default=False, verbose_name='Eliminar productos')),
-                ('inventory_create', models.BooleanField(default=False, verbose_name='Crear inventario')),
-                ('inventory_read', models.BooleanField(default=False, verbose_name='Listar inventario')),
-                ('inventory_update', models.BooleanField(default=False, verbose_name='Actualizar inventario')),
-                ('inventory_delete', models.BooleanField(default=False, verbose_name='Eliminar inventario')),
-                ('purchases_create', models.BooleanField(default=False, verbose_name='Crear compras')),
-                ('purchases_read', models.BooleanField(default=False, verbose_name='Listar compras')),
-                ('purchases_update', models.BooleanField(default=False, verbose_name='Actualizar compras')),
-                ('purchases_delete', models.BooleanField(default=False, verbose_name='Eliminar compras')),
-                ('sales_create', models.BooleanField(default=False, verbose_name='Crear ventas')),
-                ('sales_read', models.BooleanField(default=False, verbose_name='Listar ventas')),
-                ('sales_update', models.BooleanField(default=False, verbose_name='Actualizar ventas')),
-                ('sales_delete', models.BooleanField(default=False, verbose_name='Eliminar ventas')),
-                ('reports_read', models.BooleanField(default=False, verbose_name='Listar reportes')),
-                ('settings_update', models.BooleanField(default=False, verbose_name='Actualizar configuraciones')),
-                ('is_active', models.BooleanField(default=True, help_text='Indica si el registro está activo.', verbose_name='Estado')),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Fecha de creación"
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Fecha de actualización"
+                    ),
+                ),
+                (
+                    "id_role",
+                    models.BigAutoField(
+                        primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "role_name",
+                    models.CharField(
+                        help_text="Nombre único del rol.",
+                        max_length=100,
+                        unique=True,
+                        verbose_name="Nombre del rol",
+                    ),
+                ),
+                (
+                    "role_description",
+                    models.TextField(blank=True, null=True, verbose_name="Descripción"),
+                ),
+                (
+                    "users_create",
+                    models.BooleanField(default=False, verbose_name="Crear usuarios"),
+                ),
+                (
+                    "users_read",
+                    models.BooleanField(default=False, verbose_name="Listar usuarios"),
+                ),
+                (
+                    "users_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar usuarios"
+                    ),
+                ),
+                (
+                    "users_delete",
+                    models.BooleanField(
+                        default=False, verbose_name="Eliminar usuarios"
+                    ),
+                ),
+                (
+                    "customers_create",
+                    models.BooleanField(default=False, verbose_name="Crear clientes"),
+                ),
+                (
+                    "customers_read",
+                    models.BooleanField(default=False, verbose_name="Listar clientes"),
+                ),
+                (
+                    "customers_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar clientes"
+                    ),
+                ),
+                (
+                    "customers_delete",
+                    models.BooleanField(
+                        default=False, verbose_name="Eliminar clientes"
+                    ),
+                ),
+                (
+                    "suppliers_create",
+                    models.BooleanField(
+                        default=False, verbose_name="Crear proveedores"
+                    ),
+                ),
+                (
+                    "suppliers_read",
+                    models.BooleanField(
+                        default=False, verbose_name="Listar proveedores"
+                    ),
+                ),
+                (
+                    "suppliers_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar proveedores"
+                    ),
+                ),
+                (
+                    "suppliers_delete",
+                    models.BooleanField(
+                        default=False, verbose_name="Eliminar proveedores"
+                    ),
+                ),
+                (
+                    "categories_create",
+                    models.BooleanField(default=False, verbose_name="Crear categorías"),
+                ),
+                (
+                    "categories_read",
+                    models.BooleanField(
+                        default=False, verbose_name="Listar categorías"
+                    ),
+                ),
+                (
+                    "categories_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar categorías"
+                    ),
+                ),
+                (
+                    "categories_delete",
+                    models.BooleanField(
+                        default=False, verbose_name="Eliminar categorías"
+                    ),
+                ),
+                (
+                    "products_create",
+                    models.BooleanField(default=False, verbose_name="Crear productos"),
+                ),
+                (
+                    "products_read",
+                    models.BooleanField(default=False, verbose_name="Listar productos"),
+                ),
+                (
+                    "products_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar productos"
+                    ),
+                ),
+                (
+                    "products_delete",
+                    models.BooleanField(
+                        default=False, verbose_name="Eliminar productos"
+                    ),
+                ),
+                (
+                    "inventory_create",
+                    models.BooleanField(default=False, verbose_name="Crear inventario"),
+                ),
+                (
+                    "inventory_read",
+                    models.BooleanField(
+                        default=False, verbose_name="Listar inventario"
+                    ),
+                ),
+                (
+                    "inventory_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar inventario"
+                    ),
+                ),
+                (
+                    "inventory_delete",
+                    models.BooleanField(
+                        default=False, verbose_name="Eliminar inventario"
+                    ),
+                ),
+                (
+                    "purchases_create",
+                    models.BooleanField(default=False, verbose_name="Crear compras"),
+                ),
+                (
+                    "purchases_read",
+                    models.BooleanField(default=False, verbose_name="Listar compras"),
+                ),
+                (
+                    "purchases_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar compras"
+                    ),
+                ),
+                (
+                    "purchases_delete",
+                    models.BooleanField(default=False, verbose_name="Eliminar compras"),
+                ),
+                (
+                    "sales_create",
+                    models.BooleanField(default=False, verbose_name="Crear ventas"),
+                ),
+                (
+                    "sales_read",
+                    models.BooleanField(default=False, verbose_name="Listar ventas"),
+                ),
+                (
+                    "sales_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar ventas"
+                    ),
+                ),
+                (
+                    "sales_delete",
+                    models.BooleanField(default=False, verbose_name="Eliminar ventas"),
+                ),
+                (
+                    "reports_read",
+                    models.BooleanField(default=False, verbose_name="Listar reportes"),
+                ),
+                (
+                    "settings_update",
+                    models.BooleanField(
+                        default=False, verbose_name="Actualizar configuraciones"
+                    ),
+                ),
+                (
+                    "is_active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Indica si el registro está activo.",
+                        verbose_name="Estado",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Rol',
-                'verbose_name_plural': 'Roles',
-                'db_table': 'roles',
-                'ordering': ['id_role'],
-                'indexes': [models.Index(fields=['role_name'], name='roles_role_na_cfef50_idx'), models.Index(fields=['is_active'], name='roles_is_acti_723ee4_idx')],
+                "verbose_name": "Rol",
+                "verbose_name_plural": "Roles",
+                "db_table": "roles",
+                "ordering": ["id_role"],
+                "indexes": [
+                    models.Index(fields=["role_name"], name="roles_role_na_cfef50_idx"),
+                    models.Index(fields=["is_active"], name="roles_is_acti_723ee4_idx"),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('username', models.CharField(error_messages={'unique': 'A user with that username already exists.'}, help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.', max_length=150, unique=True, validators=[django.contrib.auth.validators.UnicodeUsernameValidator()], verbose_name='username')),
-                ('first_name', models.CharField(blank=True, max_length=150, verbose_name='first name')),
-                ('last_name', models.CharField(blank=True, max_length=150, verbose_name='last name')),
-                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
-                ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
-                ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Fecha de actualización')),
-                ('id_user', models.BigAutoField(primary_key=True, serialize=False, verbose_name='ID')),
-                ('document_number', models.CharField(help_text='Número de documento de identidad del usuario.', max_length=50, unique=True, validators=[django.core.validators.RegexValidator(message='El número de documento solo puede contener números.', regex='^[0-9]+$')], verbose_name='Número de documento')),
-                ('email', models.EmailField(max_length=254, unique=True, verbose_name='Correo electrónico')),
-                ('phone_number', models.CharField(blank=True, help_text='Número telefónico del usuario.', max_length=20, null=True, verbose_name='Teléfono')),
-                ('profile_photo', models.ImageField(blank=True, null=True, upload_to='users/photos/', verbose_name='Foto de perfil')),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
-                ('role', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='users', to='users.role', verbose_name='Rol')),
+                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                (
+                    "username",
+                    models.CharField(
+                        error_messages={
+                            "unique": "A user with that username already exists."
+                        },
+                        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+                        max_length=150,
+                        unique=True,
+                        validators=[
+                            django.contrib.auth.validators.UnicodeUsernameValidator()
+                        ],
+                        verbose_name="username",
+                    ),
+                ),
+                (
+                    "first_name",
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="first name"
+                    ),
+                ),
+                (
+                    "last_name",
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="last name"
+                    ),
+                ),
+                (
+                    "is_staff",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates whether the user can log into this admin site.",
+                        verbose_name="staff status",
+                    ),
+                ),
+                (
+                    "is_active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+                        verbose_name="active",
+                    ),
+                ),
+                (
+                    "date_joined",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="date joined"
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Fecha de creación"
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Fecha de actualización"
+                    ),
+                ),
+                (
+                    "id_user",
+                    models.BigAutoField(
+                        primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "document_number",
+                    models.CharField(
+                        help_text="Número de documento de identidad del usuario.",
+                        max_length=50,
+                        unique=True,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="El número de documento solo puede contener números.",
+                                regex="^[0-9]+$",
+                            )
+                        ],
+                        verbose_name="Número de documento",
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        max_length=254, unique=True, verbose_name="Correo electrónico"
+                    ),
+                ),
+                (
+                    "phone_number",
+                    models.CharField(
+                        blank=True,
+                        help_text="Número telefónico del usuario.",
+                        max_length=20,
+                        null=True,
+                        verbose_name="Teléfono",
+                    ),
+                ),
+                (
+                    "profile_photo",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        upload_to="users/photos/",
+                        verbose_name="Foto de perfil",
+                    ),
+                ),
+                (
+                    "groups",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.group",
+                        verbose_name="groups",
+                    ),
+                ),
+                (
+                    "user_permissions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Specific permissions for this user.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.permission",
+                        verbose_name="user permissions",
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="users",
+                        to="users.role",
+                        verbose_name="Rol",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Usuario',
-                'verbose_name_plural': 'Usuarios',
-                'db_table': 'users',
-                'ordering': ['id_user'],
+                "verbose_name": "Usuario",
+                "verbose_name_plural": "Usuarios",
+                "db_table": "users",
+                "ordering": ["id_user"],
             },
             managers=[
-                ('objects', apps.users.managers.UserManager()),
+                ("objects", apps.users.managers.UserManager()),
             ],
         ),
     ]

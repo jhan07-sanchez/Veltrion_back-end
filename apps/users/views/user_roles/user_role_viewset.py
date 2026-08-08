@@ -1,8 +1,18 @@
 from rest_framework import status
 from rest_framework.decorators import action
 
-from apps.core.views.base_viewset import BaseViewSet
+from apps.core.helpers.boolean_parser import parse_bool
 from apps.core.security import HasPermission
+from apps.core.views.base_viewset import BaseViewSet
+from apps.users.docs.user_role_docs import (
+    user_role_create_schema,
+    user_role_delete_schema,
+    user_role_detail_schema,
+    user_role_list_schema,
+    user_role_partial_update_schema,
+    user_role_restore_schema,
+    user_role_update_schema,
+)
 from apps.users.models import UserRole
 from apps.users.permissions import IsAuthenticatedAndActive
 from apps.users.selectors.user_role_selector import UserRoleSelector
@@ -12,17 +22,7 @@ from apps.users.serializers.user_role_serializer import (
     UserRoleListSerializer,
     UserRoleUpdateSerializer,
 )
-from apps.users.docs.user_role_docs import (
-    user_role_list_schema,
-    user_role_detail_schema,
-    user_role_create_schema,
-    user_role_update_schema,
-    user_role_partial_update_schema,
-    user_role_delete_schema,
-    user_role_restore_schema,
-)
 from apps.users.services.user_role_service import UserRoleService
-from apps.core.helpers.boolean_parser import parse_bool
 
 
 class UserRoleViewSet(BaseViewSet):
@@ -33,11 +33,7 @@ class UserRoleViewSet(BaseViewSet):
 
     queryset = UserRole.objects.all()
 
-    permission_classes = (
-        IsAuthenticatedAndActive,
-    )
-
-
+    permission_classes = (IsAuthenticatedAndActive,)
 
     def get_permissions(self):
         """
@@ -83,8 +79,6 @@ class UserRoleViewSet(BaseViewSet):
 
         return [permission() for permission in permissions]
 
-
-
     def get_queryset(self):
         """
         Retorna las asignaciones aplicando filtros.
@@ -94,7 +88,6 @@ class UserRoleViewSet(BaseViewSet):
             role=self.request.query_params.get("role"),
             is_active=parse_bool(self.request.query_params.get("is_active")),
         )
-
 
     def get_serializer_class(self):
         """
@@ -113,9 +106,6 @@ class UserRoleViewSet(BaseViewSet):
             self.action,
             UserRoleDetailSerializer,
         )
-
-
-
 
     @user_role_list_schema
     def list(self, request, *args, **kwargs):
@@ -142,9 +132,6 @@ class UserRoleViewSet(BaseViewSet):
             status_code=status.HTTP_200_OK,
         )
 
-
-
-
     @user_role_detail_schema
     def retrieve(self, request, *args, **kwargs):
         """
@@ -164,8 +151,6 @@ class UserRoleViewSet(BaseViewSet):
             message="Asignacion obtenida correctamente.",
             status_code=status.HTTP_200_OK,
         )
-
-
 
     @user_role_create_schema
     def create(self, request, *args, **kwargs):
@@ -189,14 +174,11 @@ class UserRoleViewSet(BaseViewSet):
             user_role,
         )
 
-
         return self.success_response(
             data=response_serializer.data,
             message="Rol asignado al usuario correctamente.",
             status_code=status.HTTP_201_CREATED,
         )
-
-
 
     @user_role_update_schema
     def update(self, request, *args, **kwargs):
@@ -213,9 +195,7 @@ class UserRoleViewSet(BaseViewSet):
             data=request.data,
         )
 
-        serializer.is_valid(
-            raise_exception=True
-        )
+        serializer.is_valid(raise_exception=True)
 
         user_role = UserRoleService.update_user_role(
             user_role=user_role,
@@ -231,8 +211,6 @@ class UserRoleViewSet(BaseViewSet):
             message="Asignacion actualizada correctamente",
             status_code=status.HTTP_200_OK,
         )
-
-
 
     @user_role_partial_update_schema
     def partial_update(self, request, *args, **kwargs):
@@ -263,14 +241,11 @@ class UserRoleViewSet(BaseViewSet):
             user_role,
         )
 
-
         return self.success_response(
             data=responce_serializer.data,
             message="Asignacion actualizada correctamente.",
             status_code=status.HTTP_200_OK,
         )
-
-
 
     @user_role_delete_schema
     def destroy(self, request, *args, **kwargs):
@@ -290,7 +265,6 @@ class UserRoleViewSet(BaseViewSet):
             message="Asignacion desactivada correctamente.",
             status_code=status.HTTP_200_OK,
         )
-
 
     @user_role_restore_schema
     @action(

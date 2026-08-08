@@ -4,25 +4,22 @@ from drf_spectacular.utils import (
     extend_schema,
 )
 
+from apps.core.docs.api_response_schema import build_api_response_schema
+from apps.core.docs.error_schemas import (
+    ApiErrorResponseSerializer,
+    ValidationErrorResponseSerializer,
+)
 from apps.users.serializers.user_serializer import (
     UserCreateSerializer,
     UserDetailSerializer,
     UserListSerializer,
     UserUpdateSerializer,
 )
-from apps.core.docs.api_response_schema import build_api_response_schema
-from apps.core.docs.error_schemas import (
-    ApiErrorResponseSerializer,
-    ValidationErrorResponseSerializer,
-)
 
 user_list_schema = extend_schema(
     tags=["Users"],
     summary="Listar usuarios",
-    description=(
-        "Obtiene el listado de todos los usuarios registrados "
-        "en el sistema."
-    ),
+    description=("Obtiene el listado de todos los usuarios registrados en el sistema."),
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
@@ -32,17 +29,19 @@ user_list_schema = extend_schema(
             ),
             description="Listado de usuarios.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
     },
 )
 
 user_detail_schema = extend_schema(
     tags=["Users"],
     summary="Obtener usuario",
-    description=(
-        "Obtiene toda la informacion de un usuario especifico."
-    ),
+    description=("Obtiene toda la informacion de un usuario especifico."),
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
@@ -51,9 +50,15 @@ user_detail_schema = extend_schema(
             ),
             description="Informacion del usuario.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Usuario no encontrado."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Usuario no encontrado."
+        ),
     },
 )
 
@@ -74,8 +79,12 @@ user_create_schema = extend_schema(
             response=ValidationErrorResponseSerializer,
             description="Datos inválidos de validación.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
     },
     examples=[
         OpenApiExample(
@@ -107,10 +116,18 @@ user_update_schema = extend_schema(
             ),
             description="Usuario actualizado correctamente.",
         ),
-        400: OpenApiResponse(response=ValidationErrorResponseSerializer, description="Datos inválidos."),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Usuario no encontrado."),
+        400: OpenApiResponse(
+            response=ValidationErrorResponseSerializer, description="Datos inválidos."
+        ),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Usuario no encontrado."
+        ),
     },
 )
 
@@ -127,10 +144,18 @@ user_partial_update_schema = extend_schema(
             ),
             description="Usuario actualizado correctamente.",
         ),
-        400: OpenApiResponse(response=ValidationErrorResponseSerializer, description="Datos inválidos."),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Usuario no encontrado."),
+        400: OpenApiResponse(
+            response=ValidationErrorResponseSerializer, description="Datos inválidos."
+        ),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Usuario no encontrado."
+        ),
     },
 )
 
@@ -147,9 +172,15 @@ user_delete_schema = extend_schema(
             ),
             description="Usuario desactivado correctamente.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Usuario no encontrado."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Usuario no encontrado."
+        ),
     },
 )
 
@@ -165,8 +196,14 @@ user_restore_schema = extend_schema(
             ),
             description="Usuario restaurado correctamente.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Usuario no encontrado."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Usuario no encontrado."
+        ),
     },
 )

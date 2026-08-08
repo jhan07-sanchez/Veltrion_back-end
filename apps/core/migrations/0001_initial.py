@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,25 +14,91 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='AuditLog',
+            name="AuditLog",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Fecha de actualización')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Fecha de eliminación')),
-                ('method', models.CharField(help_text='Método HTTP utilizado (ej. POST, PUT, DELETE).', max_length=10)),
-                ('path', models.CharField(help_text='Ruta del endpoint consumido.', max_length=255)),
-                ('ip_address', models.GenericIPAddressField(blank=True, help_text='Dirección IP del cliente.', null=True)),
-                ('user_agent', models.TextField(blank=True, help_text='User-Agent del cliente (navegador, herramienta, etc).', null=True)),
-                ('status_code', models.IntegerField(help_text='Código de estado HTTP retornado.')),
-                ('payload', models.JSONField(blank=True, help_text='Cuerpo de la petición (ocultando datos sensibles).', null=True)),
-                ('user', models.ForeignKey(blank=True, help_text='Usuario que realizó la acción. Nulo si fue un usuario anónimo.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='audit_logs', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Fecha de creación"
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Fecha de actualización"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Fecha de eliminación"
+                    ),
+                ),
+                (
+                    "method",
+                    models.CharField(
+                        help_text="Método HTTP utilizado (ej. POST, PUT, DELETE).",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "path",
+                    models.CharField(
+                        help_text="Ruta del endpoint consumido.", max_length=255
+                    ),
+                ),
+                (
+                    "ip_address",
+                    models.GenericIPAddressField(
+                        blank=True, help_text="Dirección IP del cliente.", null=True
+                    ),
+                ),
+                (
+                    "user_agent",
+                    models.TextField(
+                        blank=True,
+                        help_text="User-Agent del cliente (navegador, herramienta, etc).",
+                        null=True,
+                    ),
+                ),
+                (
+                    "status_code",
+                    models.IntegerField(help_text="Código de estado HTTP retornado."),
+                ),
+                (
+                    "payload",
+                    models.JSONField(
+                        blank=True,
+                        help_text="Cuerpo de la petición (ocultando datos sensibles).",
+                        null=True,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        help_text="Usuario que realizó la acción. Nulo si fue un usuario anónimo.",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="audit_logs",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Registro de Auditoría',
-                'verbose_name_plural': 'Registros de Auditoría',
-                'db_table': 'veltrion_audit_logs',
-                'ordering': ['-created_at'],
+                "verbose_name": "Registro de Auditoría",
+                "verbose_name_plural": "Registros de Auditoría",
+                "db_table": "veltrion_audit_logs",
+                "ordering": ["-created_at"],
             },
         ),
     ]

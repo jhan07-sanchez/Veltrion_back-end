@@ -92,8 +92,7 @@ class SecurityService:
         """
 
         effective_permissions = SecurityService._resolve_effective_permissions(user)
-        print("PERMISSIONS:", effective_permissions)
-        print("TYPE:", type(effective_permissions))
+
         return PermissionService.get_navigation(effective_permissions)
 
     @staticmethod

@@ -1,19 +1,18 @@
 from drf_spectacular.utils import (
-    OpenApiExample,
     OpenApiResponse,
     extend_schema,
 )
 
+from apps.core.docs.api_response_schema import build_api_response_schema
+from apps.core.docs.error_schemas import (
+    ApiErrorResponseSerializer,
+    ValidationErrorResponseSerializer,
+)
 from apps.users.serializers.user_role_serializer import (
     UserRoleCreateSerializer,
     UserRoleDetailSerializer,
     UserRoleListSerializer,
     UserRoleUpdateSerializer,
-)
-from apps.core.docs.api_response_schema import build_api_response_schema
-from apps.core.docs.error_schemas import (
-    ApiErrorResponseSerializer,
-    ValidationErrorResponseSerializer,
 )
 
 user_role_list_schema = extend_schema(
@@ -29,8 +28,12 @@ user_role_list_schema = extend_schema(
             ),
             description="Listado de asignaciones de roles.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
     },
 )
 
@@ -46,9 +49,15 @@ user_role_detail_schema = extend_schema(
             ),
             description="Información de la asignación.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Asignación no encontrada."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Asignación no encontrada."
+        ),
     },
 )
 
@@ -69,8 +78,12 @@ user_role_create_schema = extend_schema(
             response=ValidationErrorResponseSerializer,
             description="Datos inválidos de validación.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
     },
 )
 
@@ -87,10 +100,18 @@ user_role_update_schema = extend_schema(
             ),
             description="Asignación actualizada correctamente.",
         ),
-        400: OpenApiResponse(response=ValidationErrorResponseSerializer, description="Datos inválidos."),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Asignación no encontrada."),
+        400: OpenApiResponse(
+            response=ValidationErrorResponseSerializer, description="Datos inválidos."
+        ),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Asignación no encontrada."
+        ),
     },
 )
 
@@ -107,10 +128,18 @@ user_role_partial_update_schema = extend_schema(
             ),
             description="Asignación actualizada correctamente.",
         ),
-        400: OpenApiResponse(response=ValidationErrorResponseSerializer, description="Datos inválidos."),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Asignación no encontrada."),
+        400: OpenApiResponse(
+            response=ValidationErrorResponseSerializer, description="Datos inválidos."
+        ),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Asignación no encontrada."
+        ),
     },
 )
 
@@ -125,9 +154,15 @@ user_role_delete_schema = extend_schema(
             ),
             description="Asignación desactivada correctamente.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Asignación no encontrada."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Asignación no encontrada."
+        ),
     },
 )
 
@@ -143,8 +178,14 @@ user_role_restore_schema = extend_schema(
             ),
             description="Asignación restaurada correctamente.",
         ),
-        401: OpenApiResponse(response=ApiErrorResponseSerializer, description="No autenticado."),
-        403: OpenApiResponse(response=ApiErrorResponseSerializer, description="Permisos denegados."),
-        404: OpenApiResponse(response=ApiErrorResponseSerializer, description="Asignación no encontrada."),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="No autenticado."
+        ),
+        403: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Permisos denegados."
+        ),
+        404: OpenApiResponse(
+            response=ApiErrorResponseSerializer, description="Asignación no encontrada."
+        ),
     },
 )

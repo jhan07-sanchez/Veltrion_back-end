@@ -102,19 +102,31 @@ class AuthService:
         """Genera un nuevo Access Token a partir de un Refresh Token válido."""
 
         refresh_token = validated_data.get("refresh")
+        from rest_framework.exceptions import ValidationError
+        from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
         try:
-            refresh = RefreshToken(refresh_token)
-            return {"access": str(refresh.access_token)}
-        except TokenError:
+            serializer = TokenRefreshSerializer(data={"refresh": refresh_token})
+            serializer.is_valid(raise_exception=True)
+            return serializer.validated_data
+        except (TokenError, ValidationError):
             raise InvalidTokenException()
 
     @staticmethod
-    def logout(refresh_token: str) -> None:
+    def logout(refresh_token: str, user: User) -> None:
         """Invalida un Refresh Token incluyéndolo en la Blacklist."""
 
         try:
             token = RefreshToken(refresh_token)
+
+            from rest_framework_simplejwt.settings import api_settings
+
+            user_id_claim = api_settings.USER_ID_CLAIM
+
+            if str(token.payload.get(user_id_claim)) != str(user.id_user):
+                raise InvalidTokenException()
+
             token.blacklist()
         except TokenError:
-            raise InvalidTokenException()
+            # Según RFC 7009, revocar un token ya revocado o inválido debe retornar 200 OK.
+            pass

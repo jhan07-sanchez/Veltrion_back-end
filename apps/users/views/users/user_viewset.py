@@ -2,16 +2,16 @@ from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.decorators import action
 
-from apps.core.views.base_viewset import BaseViewSet
 from apps.core.security import HasPermission
+from apps.core.views.base_viewset import BaseViewSet
 from apps.users.docs.user_docs import (
     user_create_schema,
     user_delete_schema,
     user_detail_schema,
     user_list_schema,
     user_partial_update_schema,
-    user_update_schema,
     user_restore_schema,
+    user_update_schema,
 )
 from apps.users.models import User
 from apps.users.permissions import IsAuthenticatedAndActive
@@ -45,15 +45,12 @@ class UserViewSet(BaseViewSet):
         IsAuthenticatedAndActive,
     ]
 
-
     def get_queryset(self):
         """
         Obtiene el queryset de usuarios desde la capa
         de Selectors.
         """
         return UserSelector.get_users()
-
-
 
     def get_serializer_class(self):
         """
@@ -73,9 +70,6 @@ class UserViewSet(BaseViewSet):
             self.action,
             UserDetailSerializer,
         )
-
-
-
 
     def get_permissions(self):
         """
@@ -121,8 +115,6 @@ class UserViewSet(BaseViewSet):
 
         return [permission() for permission in permissions]
 
-
-
     @user_list_schema
     def list(self, request, *args, **kwargs):
         """
@@ -133,15 +125,9 @@ class UserViewSet(BaseViewSet):
         page = self.paginate_queryset(queryset)
 
         if page is not None:
-            serializer = self.get_serializer(
-                page,
-                many=True
-            )
+            serializer = self.get_serializer(page, many=True)
 
-            return self.get_paginated_response(
-                serializer.data
-            )
-
+            return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(
             queryset,
@@ -151,9 +137,8 @@ class UserViewSet(BaseViewSet):
         return self.success_response(
             data=serializer.data,
             code="USERS_FETCHED",
-            message="Usuarios obtenidos correctamente."
+            message="Usuarios obtenidos correctamente.",
         )
-
 
     @user_detail_schema
     def retrieve(self, request, *args, **kwargs):
@@ -170,7 +155,6 @@ class UserViewSet(BaseViewSet):
             code="USER_FETCHED",
             message="Usuarios obtenidos correctamente.",
         )
-
 
     @user_create_schema
     def create(self, request, *args, **kwargs):
@@ -192,7 +176,6 @@ class UserViewSet(BaseViewSet):
             status_code=status.HTTP_201_CREATED,
         )
 
-
     @user_update_schema
     def update(self, request, *args, **kwargs):
         """
@@ -201,7 +184,10 @@ class UserViewSet(BaseViewSet):
 
         user = self.get_object()
 
-        serializer = self.get_serializer(user, data=request.data,)
+        serializer = self.get_serializer(
+            user,
+            data=request.data,
+        )
         serializer.is_valid(raise_exception=True)
 
         update_user = UserService.update_user(
@@ -245,7 +231,6 @@ class UserViewSet(BaseViewSet):
             message="Usuario actualizado correctamente.",
         )
 
-
     @user_delete_schema
     def destroy(self, request, *args, **kwargs):
         """
@@ -260,8 +245,6 @@ class UserViewSet(BaseViewSet):
             message="Usuario desactivado correctamente.",
             data=None,
         )
-
-
 
     @user_restore_schema
     @action(

@@ -4,25 +4,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0004_role_user_roles_create_role_user_roles_delete_and_more'),
+        ("users", "0004_role_user_roles_create_role_user_roles_delete_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='role',
-            name='deleted_at',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Fecha de eliminación'),
+            model_name="role",
+            name="deleted_at",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Fecha de eliminación"
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='deleted_at',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Fecha de eliminación'),
+            model_name="user",
+            name="deleted_at",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Fecha de eliminación"
+            ),
         ),
         migrations.AddField(
-            model_name='userrole',
-            name='deleted_at',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Fecha de eliminación'),
+            model_name="userrole",
+            name="deleted_at",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Fecha de eliminación"
+            ),
         ),
     ]

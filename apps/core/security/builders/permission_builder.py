@@ -2,7 +2,7 @@
 Veltrion Permission Builder
 ===========================
 
-Agrupa los permisos efectivos del usuario por módulo para 
+Agrupa los permisos efectivos del usuario por módulo para
 facilitar su consumo desde el frontend.
 """
 
@@ -23,7 +23,7 @@ class PermissionBuilder:
         Agrupa los permisos efectivos (excluyendo acciones) por módulo.
 
         Args:
-            effective_permissions: 
+            effective_permissions:
                 Diccionario plano con todos los códigos de seguridad
                 evaluados (ej. {"users.view": True, "users.export": False}).
 
@@ -53,7 +53,7 @@ class PermissionBuilder:
 
                 if module_name not in grouped_permissions:
                     grouped_permissions[module_name] = {}
-                
+
                 grouped_permissions[module_name][perm_name] = has_access
 
         return grouped_permissions

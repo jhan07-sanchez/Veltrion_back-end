@@ -14,7 +14,7 @@ class UserService(BaseService[User]):
     """
     Servicio encargado de la lógica de negocio relacionada con los usuarios.
     """
-    
+
     def __init__(self):
         super().__init__(User)
 
@@ -30,16 +30,24 @@ class UserService(BaseService[User]):
             if email and User.objects.filter(email=email).exists():
                 raise EmailAlreadyExistsException()
 
-            if document_number and User.objects.filter(document_number=document_number).exists():
+            if (
+                document_number
+                and User.objects.filter(document_number=document_number).exists()
+            ):
                 raise DocumentAlreadyExistsException()
         else:
             if (
                 username
-                and User.objects.filter(username=username).exclude(pk=instance.pk).exists()
+                and User.objects.filter(username=username)
+                .exclude(pk=instance.pk)
+                .exists()
             ):
                 raise UserAlreadyExistsException()
 
-            if email and User.objects.filter(email=email).exclude(pk=instance.pk).exists():
+            if (
+                email
+                and User.objects.filter(email=email).exclude(pk=instance.pk).exists()
+            ):
                 raise EmailAlreadyExistsException()
 
             if (
@@ -49,7 +57,7 @@ class UserService(BaseService[User]):
                 .exists()
             ):
                 raise DocumentAlreadyExistsException()
-                
+
         return data
 
     def perform_create(self, data: dict) -> User:
@@ -80,7 +88,7 @@ class UserService(BaseService[User]):
         instance.is_active = False
         instance.full_clean()
         instance.save(update_fields=["is_active", "updated_at"])
-        
+
         if soft_delete:
             # Soft delete de BaseModel
             instance.delete()
@@ -112,7 +120,6 @@ class UserService(BaseService[User]):
         """
         UserService().delete(user, soft_delete=False)
         return user
-
 
     @staticmethod
     @transaction.atomic

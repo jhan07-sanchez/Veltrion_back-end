@@ -7,7 +7,6 @@ from apps.core.exceptions.custom_exceptions import (
 )
 from apps.core.services.base_service import BaseService
 from apps.users.models import UserRole
-from apps.users.selectors.user_role_selector import UserRoleSelector
 
 
 class UserRoleService(BaseService[UserRole]):
@@ -15,10 +14,10 @@ class UserRoleService(BaseService[UserRole]):
     Servicio encargado de la lógica de negocio relacionada
     con la asignación de roles a usuarios.
     """
-    
+
     def __init__(self):
         super().__init__(UserRole)
-        
+
     def validate(self, data: dict, instance=None) -> dict:
         user = data.get("user")
         role = data.get("role")
@@ -34,12 +33,17 @@ class UserRoleService(BaseService[UserRole]):
             raise UserInactiveException()
 
         if instance is None:
-            if user and role and UserRoleSelector.assignment_exists(user.id_user, role.id_role):
-                raise UserRoleAlreadyExistsException()
+            if user and role:
+                existing = UserRole.all_objects.filter(user=user, role=role).first()
+                if existing:
+                    if existing.deleted_at is None:
+                        raise UserRoleAlreadyExistsException()
+                    else:
+                        data["_existing_assignment"] = existing
         else:
             current_user = user if user else instance.user
             current_role = role if role else instance.role
-            
+
             exists = (
                 UserRole.objects.filter(
                     user=current_user,
@@ -53,10 +57,15 @@ class UserRoleService(BaseService[UserRole]):
 
             if exists:
                 raise UserRoleAlreadyExistsException()
-                
+
         return data
-        
+
     def perform_create(self, data: dict) -> UserRole:
+        existing = data.pop("_existing_assignment", None)
+        if existing:
+            existing.restore()
+            return existing
+
         user_role = UserRole(**data)
         user_role.full_clean()
         user_role.save()
