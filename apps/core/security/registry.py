@@ -363,3 +363,51 @@ class SecurityRegistry:
             cls._modules.clear()
             cls._all_permissions.clear()
             cls._all_actions.clear()
+
+
+
+
+    @classmethod
+    def get_permission_catalog(
+        cls,
+    ) -> list[dict[str, object]]:
+        """
+        Devuelve el catálogo de permisos y acciones registrados
+        actualmente en SecurityRegistry.
+        """
+
+        with cls._lock:
+            modules = sorted(
+                cls._modules.values(),
+                key=lambda module: module.order,
+            )
+
+            catalog = []
+
+            for module in modules:
+                catalog.append(
+                    {
+                        "module_id": module.module_id,
+                        "label": module.label,
+                        "icon": module.icon,
+                        "parent": module.parent,
+                        "permissions": [
+                            {
+                                "code": code,
+                                "description": description,
+                            }
+                            for code, description
+                            in module.permissions.items()
+                        ],
+                        "actions": [
+                            {
+                                "code": code,
+                                "description": description,
+                            }
+                            for code, description
+                            in module.actions.items()
+                        ],
+                    }
+                )
+
+            return catalog

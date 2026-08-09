@@ -14,6 +14,7 @@ class RoleListSerializer(serializers.ModelSerializer):
         fields = (
             "id_role",
             "role_name",
+            "role_description",
             "is_active",
         )
 

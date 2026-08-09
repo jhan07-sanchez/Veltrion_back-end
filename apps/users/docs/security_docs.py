@@ -9,6 +9,10 @@ from apps.users.serializers.auth.navigation_serializer import (
 from apps.users.serializers.auth.security_context_serializer import (
     SecurityContextResponseSerializer,
 )
+from apps.users.serializers.auth.permission_catalog_serializer import (
+    PermissionCatalogResponseSerializer,
+)
+
 
 security_context_schema = extend_schema(
     tags=["Security Dashboard"],
@@ -67,6 +71,31 @@ dashboard_schema = extend_schema(
                 data_serializer=DashboardResponseSerializer,
             ),
             description="Dashboard obtenido correctamente.",
+        ),
+        401: OpenApiResponse(
+            response=ApiErrorResponseSerializer,
+            description="Token inválido o expirado.",
+        ),
+    },
+)
+
+
+
+permission_catalog_schema = extend_schema(
+    tags=["Security"],
+    summary="Obtener catálogo de permisos",
+    description=(
+        "Retorna todos los permisos y acciones disponibles en el "
+        "sistema, registrados dinámicamente mediante "
+        "SecurityRegistry."
+    ),
+    responses={
+        200: OpenApiResponse(
+            response=build_api_response_schema(
+                name="SecurityPermissionCatalogResponse",
+                data_serializer=PermissionCatalogResponseSerializer,
+            ),
+            description="Catálogo de permisos obtenido correctamente.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,

@@ -12,6 +12,7 @@ from apps.users.views.security_view import (
     SecurityContextView,
     SecurityDashboardView,
     SecurityNavigationView,
+    SecurityPermissionCatalogView,
 )
 from apps.users.views.user_roles.user_role_viewset import UserRoleViewSet
 from apps.users.views.users.user_viewset import UserViewSet
@@ -72,5 +73,10 @@ urlpatterns = [
         "security/dashboard/",
         SecurityDashboardView.as_view(),
         name="security-dashboard",
+    ),
+    path(
+        "security/permissions/",
+        SecurityPermissionCatalogView.as_view(),
+        name="security-permission-catalog",
     ),
 ]

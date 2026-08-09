@@ -17,6 +17,10 @@ class UserRoleListSerializer(serializers.ModelSerializer):
         source="role.role_name",
         read_only=True,
     )
+    assigned_at = serializers.DateTimeField(
+        source="created_at",
+        read_only=True,
+    )
 
     class Meta:
         model = UserRole
@@ -25,6 +29,7 @@ class UserRoleListSerializer(serializers.ModelSerializer):
             "id_user_role",
             "username",
             "role_name",
+            "assigned_at",
         )
 
         read_only_fields = fields
