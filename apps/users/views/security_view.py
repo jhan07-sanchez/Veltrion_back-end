@@ -8,18 +8,18 @@ from apps.core.utils.api_response import ApiResponse
 from apps.users.docs.security_docs import (
     dashboard_schema,
     navigation_schema,
+    permission_catalog_schema,
     security_context_schema,
-    permission_catalog_schema
 )
 from apps.users.serializers.auth.dashboard_serializer import DashboardResponseSerializer
 from apps.users.serializers.auth.navigation_serializer import (
     NavigationResponseSerializer,
 )
-from apps.users.serializers.auth.security_context_serializer import (
-    SecurityContextResponseSerializer,
-)
 from apps.users.serializers.auth.permission_catalog_serializer import (
     PermissionCatalogResponseSerializer,
+)
+from apps.users.serializers.auth.security_context_serializer import (
+    SecurityContextResponseSerializer,
 )
 
 @extend_schema(
@@ -103,17 +103,6 @@ class SecurityDashboardView(APIView):
         )
 
 
-
-
-
-@extend_schema(
-    tags=["Security"],
-    summary="Catálogo de permisos",
-    description=(
-        "Retorna todos los permisos y acciones disponibles registrados en el sistema."
-    ),
-    responses={status.HTTP_200_OK: PermissionCatalogResponseSerializer},
-)
 class SecurityPermissionCatalogView(APIView):
     """Endpoint del catálogo dinámico de seguridad."""
 

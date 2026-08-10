@@ -15,11 +15,9 @@ class PermissionCatalogService:
     """
 
     @staticmethod
-    def get_catalog() -> dict[str, list[dict]]:
+    def get_catalog() -> list[dict[str, object]]:
         """
         Obtiene el catálogo registrado en SecurityRegistry.
         """
 
-        return {
-            "modules": SecurityRegistry.get_permission_catalog(),
-        }
+        return SecurityRegistry.get_permission_catalog()

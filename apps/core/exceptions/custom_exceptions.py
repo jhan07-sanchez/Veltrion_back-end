@@ -82,3 +82,16 @@ class InvalidTokenException(BusinessException):
     default_detail = "El token es inválido o ha expirado."
     default_code = ErrorCodes.AUTHENTICATION_FAILED
     status_code = 401
+
+
+
+class InvalidRolePermissionsException(BusinessException):
+    """
+    Se lanza cuando un rol contiene permisos
+    que no están registrados en SecurityRegistry.
+    """
+
+    default_detail = (
+        "El rol contiene permisos no registrados en el catálogo de seguridad."
+    )
+    default_code = ErrorCodes.INVALID_ROLE_PERMISSIONS

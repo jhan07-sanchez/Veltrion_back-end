@@ -80,9 +80,8 @@ dashboard_schema = extend_schema(
 )
 
 
-
 permission_catalog_schema = extend_schema(
-    tags=["Security"],
+    tags=["Security Dashboard"],
     summary="Obtener catálogo de permisos",
     description=(
         "Retorna todos los permisos y acciones disponibles en el "

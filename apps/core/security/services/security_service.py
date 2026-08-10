@@ -21,8 +21,10 @@ from apps.core.security.builders.action_builder import ActionBuilder
 from apps.core.security.builders.dashboard_builder import DashboardBuilder
 from apps.core.security.builders.permission_builder import PermissionBuilder
 from apps.core.security.services.permission_service import PermissionService
+from apps.core.security.services.permission_catalog_service import (
+    PermissionCatalogService,
+)
 from apps.users.dto.security_context_result import SecurityContextResult
-from apps.core.security.registry import SecurityRegistry
 
 if TYPE_CHECKING:
     from apps.users.models import User
@@ -107,17 +109,17 @@ class SecurityService:
         effective_permissions = SecurityService._resolve_effective_permissions(user)
         return DashboardBuilder.build(effective_permissions)
 
-
-
-
     @staticmethod
     def get_permission_catalog() -> list[dict[str, object]]:
         """
         Obtiene el catálogo completo de permisos y acciones
         registrados en SecurityRegistry.
 
+        Delega a ``PermissionCatalogService`` como punto de
+        acceso al catálogo de seguridad.
+
         Returns:
             Lista de módulos con sus permisos y acciones disponibles.
         """
 
-        return SecurityRegistry.get_permission_catalog()
+        return PermissionCatalogService.get_catalog()

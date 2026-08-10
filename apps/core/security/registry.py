@@ -364,9 +364,6 @@ class SecurityRegistry:
             cls._all_permissions.clear()
             cls._all_actions.clear()
 
-
-
-
     @classmethod
     def get_permission_catalog(
         cls,
