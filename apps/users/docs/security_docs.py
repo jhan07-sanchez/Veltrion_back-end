@@ -45,7 +45,7 @@ navigation_schema = extend_schema(
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="SecurityNavigationResponse",
+                name="SecurityNavigationApiResponse",
                 data_serializer=NavigationResponseSerializer,
             ),
             description="Navegación obtenida correctamente.",
@@ -67,7 +67,7 @@ dashboard_schema = extend_schema(
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="SecurityDashboardResponse",
+                name="SecurityDashboardApiResponse",
                 data_serializer=DashboardResponseSerializer,
             ),
             description="Dashboard obtenido correctamente.",
@@ -91,7 +91,7 @@ permission_catalog_schema = extend_schema(
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="SecurityPermissionCatalogResponse",
+                name="SecurityPermissionCatalogApiResponse",
                 data_serializer=PermissionCatalogResponseSerializer,
             ),
             description="Catálogo de permisos obtenido correctamente.",

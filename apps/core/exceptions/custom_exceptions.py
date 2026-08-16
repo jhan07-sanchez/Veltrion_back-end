@@ -95,3 +95,13 @@ class InvalidRolePermissionsException(BusinessException):
         "El rol contiene permisos no registrados en el catálogo de seguridad."
     )
     default_code = ErrorCodes.INVALID_ROLE_PERMISSIONS
+
+
+
+class CustomerAlreadyExistsException(BusinessException):
+    default_detail = "El cliente ya existe."
+    default_code = ErrorCodes.CUSTOMER_ALREADY_EXISTS
+
+class CustomerInactiveException(BusinessException):
+    default_detail = "El cliente se encuentra inactivo."
+    default_code = ErrorCodes.CUSTOMER_INACTIVE

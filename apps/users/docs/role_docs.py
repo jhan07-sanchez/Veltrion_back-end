@@ -1,5 +1,7 @@
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (
     OpenApiExample,
+    OpenApiParameter,
     OpenApiResponse,
     extend_schema,
 )
@@ -16,10 +18,28 @@ from apps.users.serializers.role_serializer import (
     RoleUpdateSerializer,
 )
 
+pagination_parameters = [
+    OpenApiParameter(
+        name="page",
+        type=OpenApiTypes.INT,
+        location=OpenApiParameter.QUERY,
+        description="Número de página para la paginación.",
+        required=False,
+    ),
+    OpenApiParameter(
+        name="page_size",
+        type=OpenApiTypes.INT,
+        location=OpenApiParameter.QUERY,
+        description="Cantidad de resultados por página.",
+        required=False,
+    ),
+]
+
 role_list_schema = extend_schema(
     tags=["Roles"],
     summary="Listar roles",
-    description=("Obtiene el listado de todos los roles registrados en el sistema."),
+    description="Obtiene el listado paginado de todos los roles registrados en el sistema.",
+    parameters=pagination_parameters,
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
@@ -27,13 +47,15 @@ role_list_schema = extend_schema(
                 data_serializer=RoleListSerializer,
                 is_list=True,
             ),
-            description="Listado de roles.",
+            description="Listado de roles obtenido correctamente.",
         ),
         401: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="No autenticado."
+            response=ApiErrorResponseSerializer,
+            description="Token inválido, expirado o usuario no autenticado."
         ),
         403: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Permisos denegados."
+            response=ApiErrorResponseSerializer,
+            description="El usuario no tiene permiso para consultar roles."
         ),
     },
 )
@@ -41,23 +63,35 @@ role_list_schema = extend_schema(
 role_detail_schema = extend_schema(
     tags=["Roles"],
     summary="Obtener rol",
-    description="Obtiene la información detallada de un rol.",
+    description="Obtiene la información detallada de un rol específico.",
+    parameters=[
+        OpenApiParameter(
+            name="id",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.PATH,
+            description="Identificador único del rol.",
+            required=True,
+        )
+    ],
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
                 name="RoleDetailResponse",
                 data_serializer=RoleDetailSerializer,
             ),
-            description="Información del rol.",
+            description="Información del rol obtenida correctamente.",
         ),
         401: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="No autenticado."
+            response=ApiErrorResponseSerializer,
+            description="Token inválido, expirado o usuario no autenticado."
         ),
         403: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Permisos denegados."
+            response=ApiErrorResponseSerializer,
+            description="El usuario no tiene permiso para consultar roles."
         ),
         404: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+            response=ApiErrorResponseSerializer,
+            description="Rol no encontrado."
         ),
     },
 )
@@ -65,7 +99,10 @@ role_detail_schema = extend_schema(
 role_create_schema = extend_schema(
     tags=["Roles"],
     summary="Crear rol",
-    description="Crea un nuevo rol dentro del sistema.",
+    description=(
+        "Crea un nuevo rol dentro del sistema. "
+        "El campo 'permissions' recibe un JSON con los permisos activos del rol basado en el SecurityRegistry."
+    ),
     request=RoleCreateSerializer,
     responses={
         201: OpenApiResponse(
@@ -77,13 +114,15 @@ role_create_schema = extend_schema(
         ),
         400: OpenApiResponse(
             response=ValidationErrorResponseSerializer,
-            description="Datos inválidos de validación.",
+            description="Datos inválidos. Códigos posibles: ROLE_ALREADY_EXISTS, INVALID_ROLE_PERMISSIONS.",
         ),
         401: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="No autenticado."
+            response=ApiErrorResponseSerializer,
+            description="Token inválido, expirado o usuario no autenticado."
         ),
         403: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Permisos denegados."
+            response=ApiErrorResponseSerializer,
+            description="El usuario no tiene permiso para crear roles."
         ),
     },
     examples=[
@@ -94,6 +133,11 @@ role_create_schema = extend_schema(
                 "role_name": "Administrador",
                 "role_description": "Control total del sistema",
                 "is_active": True,
+                "permissions": {
+                    "users.view": True,
+                    "users.create": True,
+                    "customers.view": True
+                }
             },
         )
     ],
@@ -103,6 +147,15 @@ role_update_schema = extend_schema(
     tags=["Roles"],
     summary="Actualizar rol",
     description="Actualiza completamente un rol.",
+    parameters=[
+        OpenApiParameter(
+            name="id",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.PATH,
+            description="Identificador único del rol a actualizar.",
+            required=True,
+        )
+    ],
     request=RoleUpdateSerializer,
     responses={
         200: OpenApiResponse(
@@ -113,16 +166,20 @@ role_update_schema = extend_schema(
             description="Rol actualizado correctamente.",
         ),
         400: OpenApiResponse(
-            response=ValidationErrorResponseSerializer, description="Datos inválidos."
+            response=ValidationErrorResponseSerializer,
+            description="Datos inválidos. Códigos posibles: ROLE_ALREADY_EXISTS, INVALID_ROLE_PERMISSIONS.",
         ),
         401: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="No autenticado."
+            response=ApiErrorResponseSerializer,
+            description="Token inválido, expirado o usuario no autenticado."
         ),
         403: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Permisos denegados."
+            response=ApiErrorResponseSerializer,
+            description="El usuario no tiene permiso para actualizar roles."
         ),
         404: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+            response=ApiErrorResponseSerializer,
+            description="Rol no encontrado."
         ),
     },
 )
@@ -131,6 +188,15 @@ role_partial_update_schema = extend_schema(
     tags=["Roles"],
     summary="Actualizar parcialmente un rol",
     description="Actualiza uno o varios campos de un rol.",
+    parameters=[
+        OpenApiParameter(
+            name="id",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.PATH,
+            description="Identificador único del rol a actualizar parcialmente.",
+            required=True,
+        )
+    ],
     request=RoleUpdateSerializer,
     responses={
         200: OpenApiResponse(
@@ -141,16 +207,20 @@ role_partial_update_schema = extend_schema(
             description="Rol actualizado correctamente.",
         ),
         400: OpenApiResponse(
-            response=ValidationErrorResponseSerializer, description="Datos inválidos."
+            response=ValidationErrorResponseSerializer,
+            description="Datos inválidos. Códigos posibles: ROLE_ALREADY_EXISTS, INVALID_ROLE_PERMISSIONS.",
         ),
         401: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="No autenticado."
+            response=ApiErrorResponseSerializer,
+            description="Token inválido, expirado o usuario no autenticado."
         ),
         403: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Permisos denegados."
+            response=ApiErrorResponseSerializer,
+            description="El usuario no tiene permiso para actualizar roles."
         ),
         404: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+            response=ApiErrorResponseSerializer,
+            description="Rol no encontrado."
         ),
     },
 )
@@ -159,6 +229,15 @@ role_delete_schema = extend_schema(
     tags=["Roles"],
     summary="Desactivar rol",
     description="Realiza el borrado lógico del rol.",
+    parameters=[
+        OpenApiParameter(
+            name="id",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.PATH,
+            description="Identificador único del rol a desactivar.",
+            required=True,
+        )
+    ],
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
@@ -166,14 +245,21 @@ role_delete_schema = extend_schema(
             ),
             description="Rol desactivado correctamente.",
         ),
+        400: OpenApiResponse(
+            response=ValidationErrorResponseSerializer,
+            description="No fue posible desactivar el rol. Códigos posibles: ROLE_INACTIVE.",
+        ),
         401: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="No autenticado."
+            response=ApiErrorResponseSerializer,
+            description="Token inválido, expirado o usuario no autenticado."
         ),
         403: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Permisos denegados."
+            response=ApiErrorResponseSerializer,
+            description="El usuario no tiene permiso para eliminar roles."
         ),
         404: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+            response=ApiErrorResponseSerializer,
+            description="Rol no encontrado."
         ),
     },
 )
@@ -182,6 +268,15 @@ role_restore_schema = extend_schema(
     tags=["Roles"],
     summary="Restaurar rol",
     description="Reactiva un rol previamente desactivado.",
+    parameters=[
+        OpenApiParameter(
+            name="id",
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.PATH,
+            description="Identificador único del rol a restaurar.",
+            required=True,
+        )
+    ],
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
@@ -190,14 +285,21 @@ role_restore_schema = extend_schema(
             ),
             description="Rol restaurado correctamente.",
         ),
+        400: OpenApiResponse(
+            response=ValidationErrorResponseSerializer,
+            description="No fue posible restaurar el rol.",
+        ),
         401: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="No autenticado."
+            response=ApiErrorResponseSerializer,
+            description="Token inválido, expirado o usuario no autenticado."
         ),
         403: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Permisos denegados."
+            response=ApiErrorResponseSerializer,
+            description="El usuario no tiene permiso para restaurar roles."
         ),
         404: OpenApiResponse(
-            response=ApiErrorResponseSerializer, description="Rol no encontrado."
+            response=ApiErrorResponseSerializer,
+            description="Rol no encontrado."
         ),
     },
 )

@@ -28,7 +28,7 @@ login_schema = extend_schema(
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="AuthLoginResponse",
+                name="AuthLoginApiResponse",
                 data_serializer=LoginResponseSerializer,
             ),
             description="Inicio de sesión exitoso.",
@@ -39,7 +39,7 @@ login_schema = extend_schema(
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Usuario o contraseña incorrectos.",
+            description="Usuario o contraseña incorrectos. Código posible: AUTHENTICATION_FAILED.",
         ),
     },
     examples=[
@@ -64,14 +64,14 @@ me_schema = extend_schema(
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="AuthMeResponse",
+                name="AuthMeApiResponse",
                 data_serializer=MeResponseSerializer,
             ),
             description="Información del usuario autenticado.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token inválido o expirado.",
+            description="Token inválido o expirado. Código posible: AUTHENTICATION_FAILED.",
         ),
     },
 )
@@ -95,7 +95,7 @@ refresh_schema = extend_schema(
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token expirado o no válido para renovación.",
+            description="Token expirado o no válido para renovación. Código posible: AUTHENTICATION_FAILED.",
         ),
     },
 )
@@ -107,7 +107,7 @@ logout_schema = extend_schema(
     request=AuthLogoutSerializer,
     responses={
         200: OpenApiResponse(
-            response=build_api_response_schema(name="AuthLogoutResponse"),
+            response=build_api_response_schema(name="AuthLogoutApiResponse"),
             description="Sesión cerrada correctamente.",
         ),
         400: OpenApiResponse(

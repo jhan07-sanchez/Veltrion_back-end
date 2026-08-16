@@ -16,6 +16,7 @@ from apps.users.views.security_view import (
 )
 from apps.users.views.user_roles.user_role_viewset import UserRoleViewSet
 from apps.users.views.users.user_viewset import UserViewSet
+from apps.customers.views.customer_viewset import CustomerViewSet
 
 router = DefaultRouter()
 
@@ -35,6 +36,12 @@ router.register(
     r"user-roles",
     UserRoleViewSet,
     basename="user-roles",
+)
+
+router.register(
+    r"customers",
+    CustomerViewSet,
+    basename="customers",
 )
 
 urlpatterns = [

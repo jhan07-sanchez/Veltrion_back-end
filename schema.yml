@@ -2,28 +2,36 @@ openapi: 3.0.3
 info:
   title: Veltrion API
   version: 1.0.0
-  description: API REST del sistema Veltrion
+  description: API REST empresarial del sistema Veltrion.\n\nEsta API proporciona
+    acceso completo a los módulos, de Veltrion ERP.\n\n**Características Principales:**\n-
+    Respuestas estandarizadas en formato JSON.\n- Autenticación segura mediante tokens
+    JWT.\n- Paginación unificada y filtros avanzados.
+  termsOfService: https://www.veltrion.com/terms/
+  contact:
+    name: Soporte Veltrion
+    url: ''
+    email: jhansancheza@gmail.com
 paths:
   /api/v1/auth/login/:
     post:
-      operationId: v1_auth_login_create
+      operationId: auth_login_create
       description: Autentica un usuario utilizando su nombre de usuario y contraseña.
         Si las credenciales son válidas, retorna la información del usuario junto
         con un Access Token y un Refresh Token JWT.
       summary: Iniciar sesión
       tags:
-      - Autenticación
+      - Authentication
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/AuthLogin'
             examples:
-              EjemploDeLogin:
+              EjemploDeLoginExitoso:
                 value:
                   username: software_veltrion
                   password: '12345678'
-                summary: Ejemplo de Login
+                summary: Ejemplo de Login Exitoso
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/AuthLogin'
@@ -43,12 +51,20 @@ paths:
                 $ref: '#/components/schemas/AuthLoginResponse'
           description: Inicio de sesión exitoso.
         '400':
-          description: Credenciales inválidas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Credenciales inválidas (error de validación).
         '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
           description: Usuario o contraseña incorrectos.
   /api/v1/auth/logout/:
     post:
-      operationId: v1_auth_logout_create
+      operationId: auth_logout_create
       description: Invalida el Refresh Token proporcionado.
       summary: Cerrar sesión
       tags:
@@ -70,15 +86,31 @@ paths:
       - jwtAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthLogoutResponse'
+          description: Sesión cerrada correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Token no proporcionado.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
   /api/v1/auth/me/:
     get:
-      operationId: v1_auth_me_retrieve
+      operationId: auth_me_retrieve
       description: Retorna la información del usuario autenticado a partir del Access
         Token enviado en el encabezado Authorization.
       summary: Obtener usuario autenticado
       tags:
-      - Autenticación
+      - Authentication
       security:
       - jwtAuth: []
       - jwtAuth: []
@@ -90,10 +122,14 @@ paths:
                 $ref: '#/components/schemas/AuthMeResponse'
           description: Información del usuario autenticado.
         '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
           description: Token inválido o expirado.
   /api/v1/auth/refresh/:
     post:
-      operationId: v1_auth_refresh_create
+      operationId: auth_refresh_create
       description: Genera un nuevo Access Token a partir de un Refresh Token válido.
       summary: Renovar Access Token
       tags:
@@ -119,11 +155,384 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthRefreshResponse'
-          description: ''
+                $ref: '#/components/schemas/AuthRefreshApiResponse'
+          description: Token renovado exitosamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Token no enviado o inválido.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token expirado o no válido para renovación.
+  /api/v1/customers/:
+    get:
+      operationId: customers_list
+      description: Obtiene el listado paginado de clientes registrados en el sistema.
+      summary: Listar clientes
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - Customers
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomerListApiResponseList'
+          description: Clientes obtenidos correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para consultar clientes.
+    post:
+      operationId: customers_create
+      description: Registra un nuevo cliente en el sistema. El número de documento
+        debe ser único.
+      summary: Crear cliente
+      tags:
+      - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCreateApiResponse'
+          description: Cliente creado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Los datos enviados no son válidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para crear clientes.
+  /api/v1/customers/{id_customer}/:
+    get:
+      operationId: customers_retrieve
+      description: Obtiene la información detallada de un cliente mediante su identificador.
+      summary: Obtener cliente
+      parameters:
+      - in: path
+        name: id_customer
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - Customers
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDetailApiResponse'
+          description: Cliente obtenido correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para consultar clientes.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Cliente no encontrado.
+    put:
+      operationId: customers_update
+      description: Actualiza completamente la información de un cliente existente.
+      summary: Actualizar cliente
+      parameters:
+      - in: path
+        name: id_customer
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerUpdateApiResponse'
+          description: Cliente actualizado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Los datos enviados no son válidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para actualizar clientes.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Cliente no encontrado.
+    patch:
+      operationId: customers_partial_update
+      description: Actualiza parcialmente la información de un cliente existente.
+      summary: Actualizar parcialmente cliente
+      parameters:
+      - in: path
+        name: id_customer
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomerDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomerDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomerDetail'
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPartialUpdateApiResponse'
+          description: Cliente actualizado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Los datos enviados no son válidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para actualizar clientes.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Cliente no encontrado.
+    delete:
+      operationId: customers_destroy
+      description: Desactiva lógicamente un cliente. El registro no se elimina físicamente
+        de la base de datos.
+      summary: Desactivar cliente
+      parameters:
+      - in: path
+        name: id_customer
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - Customers
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDeleteApiResponse'
+          description: Cliente desactivado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No fue posible desactivar el cliente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para eliminar clientes.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Cliente no encontrado.
+  /api/v1/customers/{id_customer}/restore/:
+    post:
+      operationId: customers_restore_create
+      description: Reactiva un cliente previamente desactivado.
+      summary: Restaurar cliente
+      parameters:
+      - in: path
+        name: id_customer
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomerDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerRestoreApiResponse'
+          description: Cliente restaurado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No fue posible restaurar el cliente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para restaurar clientes.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Cliente no encontrado.
   /api/v1/roles/:
     get:
-      operationId: v1_roles_list
+      operationId: roles_list
       description: Obtiene el listado de todos los roles registrados en el sistema.
       summary: Listar roles
       parameters:
@@ -151,8 +560,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedRoleListResponseList'
           description: Listado de roles.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
     post:
-      operationId: v1_roles_create
+      operationId: roles_create
       description: Crea un nuevo rol dentro del sistema.
       summary: Crear rol
       tags:
@@ -187,10 +608,26 @@ paths:
                 $ref: '#/components/schemas/RoleCreateResponse'
           description: Rol creado correctamente.
         '400':
-          description: Datos inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos de validación.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
   /api/v1/roles/{id_role}/:
     get:
-      operationId: v1_roles_retrieve
+      operationId: roles_retrieve
       description: Obtiene la información detallada de un rol.
       summary: Obtener rol
       parameters:
@@ -213,10 +650,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoleDetailResponse'
           description: Información del rol.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
         '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
           description: Rol no encontrado.
     put:
-      operationId: v1_roles_update
+      operationId: roles_update
       description: Actualiza completamente un rol.
       summary: Actualizar rol
       parameters:
@@ -251,8 +704,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoleUpdateResponse'
           description: Rol actualizado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Rol no encontrado.
     patch:
-      operationId: v1_roles_partial_update
+      operationId: roles_partial_update
       description: Actualiza uno o varios campos de un rol.
       summary: Actualizar parcialmente un rol
       parameters:
@@ -286,8 +763,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/RolePartialUpdateResponse'
           description: Rol actualizado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Rol no encontrado.
     delete:
-      operationId: v1_roles_destroy
+      operationId: roles_destroy
       description: Realiza el borrado lógico del rol.
       summary: Desactivar rol
       parameters:
@@ -310,9 +811,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoleDeleteResponse'
           description: Rol desactivado correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Rol no encontrado.
   /api/v1/roles/{id_role}/restore/:
     post:
-      operationId: v1_roles_restore_create
+      operationId: roles_restore_create
       description: Reactiva un rol previamente desactivado.
       summary: Restaurar rol
       parameters:
@@ -347,13 +866,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoleRestoreResponse'
           description: Rol restaurado correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Rol no encontrado.
   /api/v1/security/context/:
     get:
-      operationId: v1_security_context_retrieve
+      operationId: security_context_retrieve
       description: Retorna roles, permisos efectivos y acciones del usuario autenticado.
       summary: Obtener contexto de autorización
       tags:
-      - Seguridad
+      - Security Dashboard
       security:
       - jwtAuth: []
       - jwtAuth: []
@@ -362,18 +899,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SecurityContextResponse'
+                $ref: '#/components/schemas/SecurityContextApiResponse'
           description: Contexto de autorización obtenido correctamente.
         '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
           description: Token inválido o expirado.
   /api/v1/security/dashboard/:
     get:
-      operationId: v1_security_dashboard_retrieve
+      operationId: security_dashboard_retrieve
       description: Retorna los widgets del dashboard según los permisos efectivos
         del usuario autenticado.
       summary: Obtener dashboard dinámico
       tags:
-      - Seguridad
+      - Security Dashboard
       security:
       - jwtAuth: []
       - jwtAuth: []
@@ -385,15 +926,19 @@ paths:
                 $ref: '#/components/schemas/SecurityDashboardResponse'
           description: Dashboard obtenido correctamente.
         '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
           description: Token inválido o expirado.
   /api/v1/security/navigation/:
     get:
-      operationId: v1_security_navigation_retrieve
+      operationId: security_navigation_retrieve
       description: Retorna el árbol de navegación filtrado según los permisos efectivos
         del usuario autenticado.
       summary: Obtener navegación dinámica
       tags:
-      - Seguridad
+      - Security Dashboard
       security:
       - jwtAuth: []
       - jwtAuth: []
@@ -405,10 +950,38 @@ paths:
                 $ref: '#/components/schemas/SecurityNavigationResponse'
           description: Navegación obtenida correctamente.
         '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido o expirado.
+  /api/v1/security/permissions/:
+    get:
+      operationId: security_permissions_retrieve
+      description: Retorna todos los permisos y acciones disponibles en el sistema,
+        registrados dinámicamente mediante SecurityRegistry.
+      summary: Obtener catálogo de permisos
+      tags:
+      - Security Dashboard
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityPermissionCatalogResponse'
+          description: Catálogo de permisos obtenido correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
           description: Token inválido o expirado.
   /api/v1/user-roles/:
     get:
-      operationId: v1_user_roles_list
+      operationId: user_roles_list
       description: Obtiene el listado de todas las asignaciones de roles a usuarios.
       summary: Listar asignaciones de roles
       parameters:
@@ -436,8 +1009,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedUserRoleListResponseList'
           description: Listado de asignaciones de roles.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
     post:
-      operationId: v1_user_roles_create
+      operationId: user_roles_create
       description: Crea una nueva asignación de rol a un usuario.
       summary: Asignar rol a usuario
       tags:
@@ -465,10 +1050,26 @@ paths:
                 $ref: '#/components/schemas/UserRoleCreateResponse'
           description: Asignación creada correctamente.
         '400':
-          description: Datos inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos de validación.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
   /api/v1/user-roles/{id_user_role}/:
     get:
-      operationId: v1_user_roles_retrieve
+      operationId: user_roles_retrieve
       description: Obtiene la información detallada de una asignación de rol.
       summary: Obtener asignación de rol
       parameters:
@@ -491,10 +1092,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRoleDetailResponse'
           description: Información de la asignación.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
         '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
           description: Asignación no encontrada.
     put:
-      operationId: v1_user_roles_update
+      operationId: user_roles_update
       description: Actualiza completamente una asignación de rol.
       summary: Actualizar asignación
       parameters:
@@ -529,8 +1146,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRoleUpdateResponse'
           description: Asignación actualizada correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Asignación no encontrada.
     patch:
-      operationId: v1_user_roles_partial_update
+      operationId: user_roles_partial_update
       description: Actualiza uno o varios campos de una asignación.
       summary: Actualizar parcialmente una asignación
       parameters:
@@ -564,8 +1205,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRolePartialUpdateResponse'
           description: Asignación actualizada correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Asignación no encontrada.
     delete:
-      operationId: v1_user_roles_destroy
+      operationId: user_roles_destroy
       description: Realiza el borrado lógico de la asignación.
       summary: Desactivar asignación
       parameters:
@@ -588,9 +1253,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRoleDeleteResponse'
           description: Asignación desactivada correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Asignación no encontrada.
   /api/v1/user-roles/{id_user_role}/restore/:
     post:
-      operationId: v1_user_roles_restore_create
+      operationId: user_roles_restore_create
       description: Reactiva una asignación previamente desactivada.
       summary: Restaurar asignación
       parameters:
@@ -625,9 +1308,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRoleRestoreResponse'
           description: Asignación restaurada correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Asignación no encontrada.
   /api/v1/users/:
     get:
-      operationId: v1_users_list
+      operationId: users_list
       description: Obtiene el listado de todos los usuarios registrados en el sistema.
       summary: Listar usuarios
       parameters:
@@ -644,7 +1345,7 @@ paths:
         schema:
           type: integer
       tags:
-      - Usuarios
+      - Users
       security:
       - jwtAuth: []
       - jwtAuth: []
@@ -655,12 +1356,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedUserListResponseList'
           description: Listado de usuarios.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
     post:
-      operationId: v1_users_create
+      operationId: users_create
       description: Crea un nuevo usuario dentro del sistema.
       summary: Crear usuario
       tags:
-      - Usuarios
+      - Users
       requestBody:
         content:
           application/json:
@@ -695,10 +1408,26 @@ paths:
                 $ref: '#/components/schemas/UserCreateResponse'
           description: Usuario creado correctamente.
         '400':
-          description: Datos invalidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos de validación.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
   /api/v1/users/{id_user}/:
     get:
-      operationId: v1_users_retrieve
+      operationId: users_retrieve
       description: Obtiene toda la informacion de un usuario especifico.
       summary: Obtener usuario
       parameters:
@@ -710,7 +1439,7 @@ paths:
         description: Un valor de entero único que identifique este Usuario.
         required: true
       tags:
-      - Usuarios
+      - Users
       security:
       - jwtAuth: []
       - jwtAuth: []
@@ -721,10 +1450,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserDetailResponse'
           description: Informacion del usuario.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
         '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
           description: Usuario no encontrado.
     put:
-      operationId: v1_users_update
+      operationId: users_update
       description: Actualiza completamente un usuario.
       summary: Actualizar usuario
       parameters:
@@ -736,7 +1481,7 @@ paths:
         description: Un valor de entero único que identifique este Usuario.
         required: true
       tags:
-      - Usuarios
+      - Users
       requestBody:
         content:
           application/json:
@@ -759,8 +1504,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserUpdateResponse'
           description: Usuario actualizado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Usuario no encontrado.
     patch:
-      operationId: v1_users_partial_update
+      operationId: users_partial_update
       description: Actualiza uno o varios campos del usuario.
       summary: Actualizar parcialmente un usuario
       parameters:
@@ -772,7 +1541,7 @@ paths:
         description: Un valor de entero único que identifique este Usuario.
         required: true
       tags:
-      - Usuarios
+      - Users
       requestBody:
         content:
           application/json:
@@ -794,8 +1563,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserPartialUpdateResponse'
           description: Usuario actualizado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Datos inválidos.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Usuario no encontrado.
     delete:
-      operationId: v1_users_destroy
+      operationId: users_destroy
       description: Realiza el borrado lógico del usuario. No elimina físicamente el
         registro.
       summary: Desactivar usuario
@@ -808,7 +1601,7 @@ paths:
         description: Un valor de entero único que identifique este Usuario.
         required: true
       tags:
-      - Usuarios
+      - Users
       security:
       - jwtAuth: []
       - jwtAuth: []
@@ -819,9 +1612,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserDeleteResponse'
           description: Usuario desactivado correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Usuario no encontrado.
   /api/v1/users/{id_user}/restore/:
     post:
-      operationId: v1_users_restore_create
+      operationId: users_restore_create
       description: Reactiva un usuario previamente desactivado.
       summary: Restaurar usuario
       parameters:
@@ -833,7 +1644,7 @@ paths:
         description: Un valor de entero único que identifique este Usuario.
         required: true
       tags:
-      - Usuarios
+      - Users
       requestBody:
         content:
           application/json:
@@ -856,8 +1667,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRestoreResponse'
           description: Usuario restaurado correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: No autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Permisos denegados.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Usuario no encontrado.
 components:
   schemas:
+    ApiErrorResponse:
+      type: object
+      description: Esquema estándar para respuestas de error de la API.
+      properties:
+        success:
+          type: boolean
+          default: false
+          description: Siempre es false en caso de error.
+        code:
+          type: string
+          default: ERROR
+          description: Código del error (ej. NOT_FOUND, PERMISSION_DENIED).
+        message:
+          type: string
+          default: Ha ocurrido un error.
+          description: Mensaje descriptivo del error.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle técnico adicional si está disponible.
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
     AuthLogin:
       type: object
       description: Serializer para validar las credenciales de inicio de sesión.
@@ -875,22 +1729,29 @@ components:
       - username
     AuthLoginResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/LoginResponse'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/LoginResponse'
+          description: Objeto de resultado.
       required:
       - data
     AuthLogout:
@@ -904,24 +1765,59 @@ components:
           type: string
       required:
       - refresh
-    AuthMeResponse:
+    AuthLogoutResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/AuthMeResponse'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Datos dinámicos de la respuesta.
+      required:
+      - data
+    AuthMeResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/MeResponse'
+          description: Objeto de resultado.
       required:
       - data
     AuthRefresh:
@@ -935,6 +1831,33 @@ components:
           description: Refresh Token del usuario.
       required:
       - refresh
+    AuthRefreshApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/AuthRefreshResponse'
+          description: Objeto de resultado.
+      required:
+      - data
     AuthRefreshResponse:
       type: object
       description: |-
@@ -946,6 +1869,373 @@ components:
           description: Nuevo Access Token.
       required:
       - access
+    CustomerCreateApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/CustomerDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    CustomerDeleteApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Datos dinámicos de la respuesta.
+      required:
+      - data
+    CustomerDetail:
+      type: object
+      description: Serializer utlizado para consultar el detalle completo de un cliente.
+      properties:
+        id_customer:
+          type: integer
+          readOnly: true
+          title: ID
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del cliente (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          title: Número de Documento
+          description: Número único de identidad del cliente.
+          maxLength: 30
+        first_name:
+          type: string
+          title: Nombres
+          maxLength: 100
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 100
+        business_name:
+          type: string
+          title: Razón Social
+          description: Nombre de la empresa o razón social del cliente.
+          maxLength: 200
+        email:
+          title: Correo Electrónico
+          description: Correo electrónico del cliente.
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          title: Teléfono
+          description: Número de teléfono del cliente.
+          maxLength: 30
+        mobile:
+          type: string
+          title: Celular
+          description: Número de celular del cliente.
+          maxLength: 30
+        address:
+          type: string
+          title: Dirección
+          description: Dirección física del cliente.
+          maxLength: 255
+        city:
+          type: string
+          title: Ciudad
+          description: Ciudad de residencia del cliente.
+          maxLength: 100
+        country:
+          type: string
+          title: País
+          description: País de residencia del cliente.
+          maxLength: 100
+        notes:
+          type: string
+          title: Notas
+          description: Notas adicionales sobre el cliente.
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el cliente está activo en el sistema.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de actualización
+      required:
+      - created_at
+      - document_number
+      - document_type
+      - id_customer
+      - updated_at
+    CustomerDetailApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/CustomerDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    CustomerList:
+      type: object
+      description: |-
+        Serializer utlizado para listar clientes.
+
+        Expone unicamente  la informacion necesaria para las tablas y listados del sistema.
+      properties:
+        id_customer:
+          type: integer
+          readOnly: true
+          title: ID
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          readOnly: true
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del cliente (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          readOnly: true
+          title: Número de Documento
+          description: Número único de identidad del cliente.
+        first_name:
+          type: string
+          readOnly: true
+          title: Nombres
+        last_name:
+          type: string
+          readOnly: true
+          title: Apellidos
+        business_name:
+          type: string
+          readOnly: true
+          title: Razón Social
+          description: Nombre de la empresa o razón social del cliente.
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Correo Electrónico
+          description: Correo electrónico del cliente.
+        phone:
+          type: string
+          readOnly: true
+          title: Teléfono
+          description: Número de teléfono del cliente.
+        mobile:
+          type: string
+          readOnly: true
+          title: Celular
+          description: Número de celular del cliente.
+        city:
+          type: string
+          readOnly: true
+          title: Ciudad
+          description: Ciudad de residencia del cliente.
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Estado
+          description: Indica si el cliente está activo en el sistema.
+      required:
+      - business_name
+      - city
+      - document_number
+      - document_type
+      - email
+      - first_name
+      - id_customer
+      - is_active
+      - last_name
+      - mobile
+      - phone
+    CustomerListApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerList'
+          description: Lista de resultados.
+      required:
+      - data
+    CustomerPartialUpdateApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/CustomerDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    CustomerRestoreApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/CustomerDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    CustomerUpdateApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/CustomerDetail'
+          description: Objeto de resultado.
+      required:
+      - data
     DashboardResponse:
       type: object
       description: |-
@@ -960,6 +2250,20 @@ components:
           readOnly: true
       required:
       - widgets
+    DocumentTypeEnum:
+      enum:
+      - CC
+      - NIT
+      - CE
+      - PAS
+      - TI
+      type: string
+      description: |-
+        * `CC` - Cédula de Ciudadanía
+        * `NIT` - Número de Identificación Tributaria
+        * `CE` - Cédula de Extranjería
+        * `PAS` - Pasaporte
+        * `TI` - Tarjeta de Identidad
     LoginResponse:
       type: object
       description: |-
@@ -981,6 +2285,77 @@ components:
       - access_token
       - refresh_token
       - user
+    MeResponse:
+      type: object
+      description: |-
+        Serializer de respuesta del endpoint ``GET /auth/me``.
+
+        Serializa únicamente la información del usuario autenticado.
+      properties:
+        user:
+          allOf:
+          - $ref: '#/components/schemas/UserDetail'
+          readOnly: true
+      required:
+      - user
+    NavigationItem:
+      type: object
+      description: Serializer recursivo para nodos del sidebar.
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        icon:
+          type: string
+        route:
+          type: string
+        permission:
+          type: string
+        order:
+          type: integer
+        children:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - id
+      - order
+      - title
+    NavigationResponse:
+      type: object
+      description: Serializer respuesta de navegación dinámica.
+      properties:
+        navigation:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationItem'
+      required:
+      - navigation
+    PaginatedCustomerListApiResponseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerListApiResponse'
     PaginatedRoleListResponseList:
       type: object
       required:
@@ -1050,15 +2425,100 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserRoleListResponse'
+    PatchedCustomerDetail:
+      type: object
+      description: Serializer utlizado para consultar el detalle completo de un cliente.
+      properties:
+        id_customer:
+          type: integer
+          readOnly: true
+          title: ID
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del cliente (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          title: Número de Documento
+          description: Número único de identidad del cliente.
+          maxLength: 30
+        first_name:
+          type: string
+          title: Nombres
+          maxLength: 100
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 100
+        business_name:
+          type: string
+          title: Razón Social
+          description: Nombre de la empresa o razón social del cliente.
+          maxLength: 200
+        email:
+          title: Correo Electrónico
+          description: Correo electrónico del cliente.
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          title: Teléfono
+          description: Número de teléfono del cliente.
+          maxLength: 30
+        mobile:
+          type: string
+          title: Celular
+          description: Número de celular del cliente.
+          maxLength: 30
+        address:
+          type: string
+          title: Dirección
+          description: Dirección física del cliente.
+          maxLength: 255
+        city:
+          type: string
+          title: Ciudad
+          description: Ciudad de residencia del cliente.
+          maxLength: 100
+        country:
+          type: string
+          title: País
+          description: País de residencia del cliente.
+          maxLength: 100
+        notes:
+          type: string
+          title: Notas
+          description: Notas adicionales sobre el cliente.
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el cliente está activo en el sistema.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de actualización
     PatchedRoleUpdate:
       type: object
       description: Serializer utilizado para actualizar un rol existente.
       properties:
-        deleted_at:
-          type: string
-          format: date-time
-          nullable: true
-          title: Fecha de eliminación
         role_name:
           type: string
           title: Nombre del rol
@@ -1069,9 +2529,9 @@ components:
           nullable: true
           title: Descripción
         permissions:
-          title: Permisos dinámicos
-          description: 'Diccionario JSON con los permisos del rol. Ejemplo: {"users.view":
-            true, "sales.create": false}'
+          type: object
+          additionalProperties:
+            type: boolean
         is_active:
           type: boolean
           title: Estado
@@ -1117,15 +2577,58 @@ components:
           title: Activo
           description: Indica si el usuario debe ser tratado como activo. Desmarque
             esta opción en lugar de borrar la cuenta.
+    PermissionCatalogItem:
+      type: object
+      description: Representa un permiso o acción disponible en el sistema.
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+      - description
+    PermissionCatalogModule:
+      type: object
+      description: Representa un módulo del catálogo de seguridad.
+      properties:
+        module_id:
+          type: string
+        label:
+          type: string
+        icon:
+          type: string
+        parent:
+          type: string
+          nullable: true
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionCatalogItem'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionCatalogItem'
+      required:
+      - actions
+      - icon
+      - label
+      - module_id
+      - permissions
+    PermissionCatalogResponse:
+      type: object
+      description: Respuesta del catálogo dinámico de seguridad.
+      properties:
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionCatalogModule'
+      required:
+      - modules
     RoleCreate:
       type: object
       description: Serializer utilizado para crear un nuevo rol.
       properties:
-        deleted_at:
-          type: string
-          format: date-time
-          nullable: true
-          title: Fecha de eliminación
         role_name:
           type: string
           title: Nombre del rol
@@ -1136,9 +2639,9 @@ components:
           nullable: true
           title: Descripción
         permissions:
-          title: Permisos dinámicos
-          description: 'Diccionario JSON con los permisos del rol. Ejemplo: {"users.view":
-            true, "sales.create": false}'
+          type: object
+          additionalProperties:
+            type: boolean
         is_active:
           type: boolean
           title: Estado
@@ -1147,44 +2650,57 @@ components:
       - role_name
     RoleCreateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/RoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/RoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     RoleDeleteResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          type: object
-          additionalProperties: {}
-          nullable: true
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Datos dinámicos de la respuesta.
       required:
       - data
     RoleDetail:
@@ -1204,6 +2720,10 @@ components:
           type: string
           nullable: true
           title: Descripción
+        permissions:
+          title: Permisos dinámicos
+          description: 'Diccionario JSON con los permisos del rol. Ejemplo: {"users.view":
+            true, "sales.create": false}'
         is_active:
           type: boolean
           title: Estado
@@ -1225,22 +2745,29 @@ components:
       - updated_at
     RoleDetailResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/RoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/RoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     RoleList:
@@ -1256,6 +2783,11 @@ components:
           readOnly: true
           title: Nombre del rol
           description: Nombre único del rol.
+        role_description:
+          type: string
+          readOnly: true
+          nullable: true
+          title: Descripción
         is_active:
           type: boolean
           readOnly: true
@@ -1264,78 +2796,94 @@ components:
       required:
       - id_role
       - is_active
+      - role_description
       - role_name
     RoleListResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
         data:
           type: array
           items:
             $ref: '#/components/schemas/RoleList'
-        success:
-          type: boolean
-          default: true
-        code:
-          type: string
-          default: SUCCESS
-        message:
-          type: string
-          default: Operación exitosa.
-        errors:
-          type: object
-          additionalProperties: {}
-          nullable: true
+          description: Lista de resultados.
       required:
       - data
     RolePartialUpdateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/RoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/RoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     RoleRestoreResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/RoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/RoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     RoleUpdate:
       type: object
       description: Serializer utilizado para actualizar un rol existente.
       properties:
-        deleted_at:
-          type: string
-          format: date-time
-          nullable: true
-          title: Fecha de eliminación
         role_name:
           type: string
           title: Nombre del rol
@@ -1346,9 +2894,9 @@ components:
           nullable: true
           title: Descripción
         permissions:
-          title: Permisos dinámicos
-          description: 'Diccionario JSON con los permisos del rol. Ejemplo: {"users.view":
-            true, "sales.create": false}'
+          type: object
+          additionalProperties:
+            type: boolean
         is_active:
           type: boolean
           title: Estado
@@ -1357,80 +2905,169 @@ components:
       - role_name
     RoleUpdateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/RoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/RoleDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    SecurityContextApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/SecurityContextResponse'
+          description: Objeto de resultado.
       required:
       - data
     SecurityContextResponse:
       type: object
+      description: |-
+        Serializer de respuesta del endpoint ``GET /security/context``.
+
+        Serializa únicamente roles, permisos efectivos y acciones.
       properties:
-        data:
-          $ref: '#/components/schemas/SecurityContextResponse'
-        success:
-          type: boolean
-          default: true
-        code:
-          type: string
-          default: SUCCESS
-        message:
-          type: string
-          default: Operación exitosa.
-        errors:
+        roles:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        permissions:
           type: object
-          additionalProperties: {}
-          nullable: true
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: boolean
+          readOnly: true
+        actions:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: boolean
+          readOnly: true
       required:
-      - data
+      - actions
+      - permissions
+      - roles
     SecurityDashboardResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/DashboardResponse'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/DashboardResponse'
+          description: Objeto de resultado.
       required:
       - data
     SecurityNavigationResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/NavigationResponse'
+          description: Objeto de resultado.
+      required:
+      - data
+    SecurityPermissionCatalogResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/PermissionCatalogResponse'
+          description: Objeto de resultado.
+      required:
+      - data
     UserCreate:
       type: object
       properties:
@@ -1474,44 +3111,57 @@ components:
       - username
     UserCreateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserDeleteResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          type: object
-          additionalProperties: {}
-          nullable: true
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Datos dinámicos de la respuesta.
       required:
       - data
     UserDetail:
@@ -1554,7 +3204,9 @@ components:
           description: Número telefónico del usuario.
           maxLength: 20
         roles:
-          type: string
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleList'
           readOnly: true
         is_active:
           type: boolean
@@ -1581,22 +3233,29 @@ components:
       - username
     UserDetailResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserList:
@@ -1633,7 +3292,9 @@ components:
           pattern: ^[0-9]+$
           maxLength: 50
         roles:
-          type: string
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleList'
           readOnly: true
         is_active:
           type: boolean
@@ -1648,64 +3309,84 @@ components:
       - username
     UserListResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
         data:
           type: array
           items:
             $ref: '#/components/schemas/UserList'
-        success:
-          type: boolean
-          default: true
-        code:
-          type: string
-          default: SUCCESS
-        message:
-          type: string
-          default: Operación exitosa.
-        errors:
-          type: object
-          additionalProperties: {}
-          nullable: true
+          description: Lista de resultados.
       required:
       - data
     UserPartialUpdateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserRestoreResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserRoleCreate:
@@ -1725,44 +3406,57 @@ components:
       - user
     UserRoleCreateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserRoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserRoleDeleteResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          type: object
-          additionalProperties: {}
-          nullable: true
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Datos dinámicos de la respuesta.
       required:
       - data
     UserRoleDetail:
@@ -1809,22 +3503,29 @@ components:
       - username
     UserRoleDetailResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserRoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserRoleList:
@@ -1841,70 +3542,95 @@ components:
         role_name:
           type: string
           readOnly: true
+        assigned_at:
+          type: string
+          format: date-time
+          readOnly: true
       required:
+      - assigned_at
       - id_user_role
       - role_name
       - username
     UserRoleListResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
         data:
           type: array
           items:
             $ref: '#/components/schemas/UserRoleList'
-        success:
-          type: boolean
-          default: true
-        code:
-          type: string
-          default: SUCCESS
-        message:
-          type: string
-          default: Operación exitosa.
-        errors:
-          type: object
-          additionalProperties: {}
-          nullable: true
+          description: Lista de resultados.
       required:
       - data
     UserRolePartialUpdateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserRoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserRoleRestoreResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserRoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserRoleUpdate:
@@ -1926,22 +3652,29 @@ components:
       - user
     UserRoleUpdateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserRoleDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleDetail'
+          description: Objeto de resultado.
       required:
       - data
     UserUpdate:
@@ -1975,26 +3708,77 @@ components:
       - email
     UserUpdateResponse:
       type: object
+      description: Respuesta estandarizada de la API.
       properties:
-        data:
-          $ref: '#/components/schemas/UserDetail'
         success:
           type: boolean
           default: true
+          description: Indica si la operación fue exitosa.
         code:
           type: string
           default: SUCCESS
+          description: Código interno del resultado de la operación.
         message:
           type: string
           default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
         errors:
           type: object
           additionalProperties: {}
           nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/UserDetail'
+          description: Objeto de resultado.
       required:
       - data
+    ValidationErrorResponse:
+      type: object
+      description: Esquema estándar para errores de validación.
+      properties:
+        success:
+          type: boolean
+          default: false
+          description: Siempre es false en caso de error.
+        code:
+          type: string
+          default: VALIDATION_ERROR
+        message:
+          type: string
+          default: Error de validación.
+        errors:
+          type: object
+          additionalProperties: {}
+          description: Diccionario donde la llave es el campo y el valor la lista
+            de errores.
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - errors
   securitySchemes:
     jwtAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+x-tagGroups:
+- name: Seguridad y Accesos
+  tags:
+  - Authentication
+  - Users
+  - Roles
+  - User Roles
+  - Security Dashboard
+tags:
+- name: Authentication
+  description: Manejo del ciclo de vida de sesiones de usuario y tokens JWT.
+- name: Users
+  description: Gestión del directorio de usuarios del sistema.
+- name: Roles
+  description: Gestión de roles y niveles de acceso.
+- name: User Roles
+  description: Asignación y manejo de roles para los usuarios.
+- name: Security Dashboard
+  description: Consultas del estado de seguridad y panel principal de navegación.

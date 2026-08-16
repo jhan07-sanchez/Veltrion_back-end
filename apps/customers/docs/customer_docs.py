@@ -11,11 +11,11 @@ from apps.core.docs.error_schemas import (
     ApiErrorResponseSerializer,
     ValidationErrorResponseSerializer,
 )
-from apps.users.serializers.user_serializer import (
-    UserCreateSerializer,
-    UserDetailSerializer,
-    UserListSerializer,
-    UserUpdateSerializer,
+from apps.customers.serializers.customer_serializer import (
+    CustomerCreateSerializer,
+    CustomerDetailSerializer,
+    CustomerListSerializer,
+    CustomerUpdateSerializer,
 )
 
 pagination_parameters = [
@@ -35,272 +35,273 @@ pagination_parameters = [
     ),
 ]
 
-user_list_schema = extend_schema(
-    tags=["Users"],
-    summary="Listar usuarios",
-    description="Obtiene el listado paginado de todos los usuarios registrados en el sistema.",
+customer_list_schema = extend_schema(
+    tags=["Customers"],
+    summary="Listar clientes",
+    description="Obtiene el listado paginado de clientes registrados en el sistema.",
     parameters=pagination_parameters,
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="UserListResponse",
-                data_serializer=UserListSerializer,
+                name="CustomerListApiResponse",
+                data_serializer=CustomerListSerializer,
                 is_list=True,
             ),
-            description="Listado de usuarios obtenido correctamente.",
+            description="Clientes obtenidos correctamente.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token inválido, expirado o usuario no autenticado."
+            description="Token inválido, expirado o usuario no autenticado.",
         ),
         403: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="El usuario no tiene permiso para consultar usuarios."
+            description="El usuario no tiene permiso para consultar clientes.",
         ),
     },
 )
 
-user_detail_schema = extend_schema(
-    tags=["Users"],
-    summary="Obtener usuario",
-    description="Obtiene toda la información detallada de un usuario específico.",
+customer_detail_schema = extend_schema(
+    tags=["Customers"],
+    summary="Obtener cliente",
+    description="Obtiene la información detallada de un cliente mediante su identificador.",
     parameters=[
         OpenApiParameter(
             name="id",
             type=OpenApiTypes.INT,
             location=OpenApiParameter.PATH,
-            description="Identificador único del usuario.",
+            description="Identificador único del cliente.",
             required=True,
         )
     ],
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="UserDetailResponse",
-                data_serializer=UserDetailSerializer,
+                name="CustomerDetailApiResponse",
+                data_serializer=CustomerDetailSerializer,
             ),
-            description="Información del usuario obtenida correctamente.",
+            description="Cliente obtenido correctamente.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token inválido, expirado o usuario no autenticado."
+            description="Token inválido, expirado o usuario no autenticado.",
         ),
         403: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="El usuario no tiene permiso para consultar usuarios."
+            description="El usuario no tiene permiso para consultar clientes.",
         ),
         404: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Usuario no encontrado."
+            description="Cliente no encontrado.",
         ),
     },
 )
 
-user_create_schema = extend_schema(
-    tags=["Users"],
-    summary="Crear usuario",
+customer_create_schema = extend_schema(
+    tags=["Customers"],
+    summary="Crear cliente",
     description=(
-        "Crea un nuevo usuario dentro del sistema. "
-        "El nombre de usuario, correo electrónico y número de documento deben ser únicos."
+        "Registra un nuevo cliente en el sistema. "
+        "El número de documento debe ser único."
     ),
-    request=UserCreateSerializer,
+    request=CustomerCreateSerializer,
     responses={
         201: OpenApiResponse(
             response=build_api_response_schema(
-                name="UserCreateResponse",
-                data_serializer=UserDetailSerializer,
+                name="CustomerCreateApiResponse",
+                data_serializer=CustomerDetailSerializer,
             ),
-            description="Usuario creado correctamente.",
+            description="Cliente creado correctamente.",
         ),
         400: OpenApiResponse(
             response=ValidationErrorResponseSerializer,
-            description="Datos inválidos. Códigos posibles: USER_ALREADY_EXISTS, EMAIL_ALREADY_EXISTS, DOCUMENT_ALREADY_EXISTS.",
+            description="Los datos enviados no son válidos. Códigos posibles: CUSTOMER_ALREADY_EXISTS.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token inválido, expirado o usuario no autenticado."
+            description="Token inválido, expirado o usuario no autenticado.",
         ),
         403: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="El usuario no tiene permiso para crear usuarios."
+            description="El usuario no tiene permiso para crear clientes.",
         ),
     },
     examples=[
         OpenApiExample(
-            "Crear Usuario",
+            "Crear Cliente",
             request_only=True,
             value={
-                "username": "juanperez",
-                "password": "Admin123*",
+                "document_type": "CC",
+                "document_number": "123456789",
                 "first_name": "Juan",
                 "last_name": "Pérez",
-                "email": "juan@gmail.com",
-                "document_number": "123456789",
+                "email": "juan@example.com",
                 "phone_number": "3001234567",
+                "is_active": True
             },
         )
     ],
 )
 
-user_update_schema = extend_schema(
-    tags=["Users"],
-    summary="Actualizar usuario",
-    description="Actualiza completamente un usuario existente.",
+customer_update_schema = extend_schema(
+    tags=["Customers"],
+    summary="Actualizar cliente",
+    description="Actualiza completamente la información de un cliente existente.",
     parameters=[
         OpenApiParameter(
             name="id",
             type=OpenApiTypes.INT,
             location=OpenApiParameter.PATH,
-            description="Identificador único del usuario a actualizar.",
+            description="Identificador único del cliente a actualizar.",
             required=True,
         )
     ],
-    request=UserUpdateSerializer,
+    request=CustomerUpdateSerializer,
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="UserUpdateResponse",
-                data_serializer=UserDetailSerializer,
+                name="CustomerUpdateApiResponse",
+                data_serializer=CustomerDetailSerializer,
             ),
-            description="Usuario actualizado correctamente.",
+            description="Cliente actualizado correctamente.",
         ),
         400: OpenApiResponse(
             response=ValidationErrorResponseSerializer,
-            description="Datos inválidos. Códigos posibles: USER_ALREADY_EXISTS, EMAIL_ALREADY_EXISTS, DOCUMENT_ALREADY_EXISTS.",
+            description="Los datos enviados no son válidos. Códigos posibles: CUSTOMER_ALREADY_EXISTS.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token inválido, expirado o usuario no autenticado."
+            description="Token inválido, expirado o usuario no autenticado.",
         ),
         403: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="El usuario no tiene permiso para actualizar usuarios."
+            description="El usuario no tiene permiso para actualizar clientes.",
         ),
         404: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Usuario no encontrado."
+            description="Cliente no encontrado.",
         ),
     },
 )
 
-user_partial_update_schema = extend_schema(
-    tags=["Users"],
-    summary="Actualizar parcialmente un usuario",
-    description="Actualiza uno o varios campos de un usuario existente.",
+customer_partial_update_schema = extend_schema(
+    tags=["Customers"],
+    summary="Actualizar parcialmente cliente",
+    description="Actualiza parcialmente la información de un cliente existente.",
     parameters=[
         OpenApiParameter(
             name="id",
             type=OpenApiTypes.INT,
             location=OpenApiParameter.PATH,
-            description="Identificador único del usuario a actualizar parcialmente.",
+            description="Identificador único del cliente a actualizar parcialmente.",
             required=True,
         )
     ],
-    request=UserUpdateSerializer,
+    request=CustomerUpdateSerializer,
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="UserPartialUpdateResponse",
-                data_serializer=UserDetailSerializer,
+                name="CustomerPartialUpdateApiResponse",
+                data_serializer=CustomerDetailSerializer,
             ),
-            description="Usuario actualizado correctamente.",
+            description="Cliente actualizado correctamente.",
         ),
         400: OpenApiResponse(
             response=ValidationErrorResponseSerializer,
-            description="Datos inválidos. Códigos posibles: USER_ALREADY_EXISTS, EMAIL_ALREADY_EXISTS, DOCUMENT_ALREADY_EXISTS.",
+            description="Los datos enviados no son válidos. Códigos posibles: CUSTOMER_ALREADY_EXISTS.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token inválido, expirado o usuario no autenticado."
+            description="Token inválido, expirado o usuario no autenticado.",
         ),
         403: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="El usuario no tiene permiso para actualizar usuarios."
+            description="El usuario no tiene permiso para actualizar clientes.",
         ),
         404: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Usuario no encontrado."
+            description="Cliente no encontrado.",
         ),
     },
 )
 
-user_delete_schema = extend_schema(
-    tags=["Users"],
-    summary="Desactivar usuario",
+customer_delete_schema = extend_schema(
+    tags=["Customers"],
+    summary="Desactivar cliente",
     description=(
-        "Realiza el borrado lógico del usuario. No elimina físicamente el registro."
+        "Desactiva lógicamente un cliente. "
+        "El registro no se elimina físicamente de la base de datos."
     ),
     parameters=[
         OpenApiParameter(
             name="id",
             type=OpenApiTypes.INT,
             location=OpenApiParameter.PATH,
-            description="Identificador único del usuario a desactivar.",
+            description="Identificador único del cliente a desactivar.",
             required=True,
         )
     ],
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="UserDeleteResponse",
+                name="CustomerDeleteApiResponse",
             ),
-            description="Usuario desactivado correctamente.",
+            description="Cliente desactivado correctamente.",
         ),
         400: OpenApiResponse(
             response=ValidationErrorResponseSerializer,
-            description="No fue posible desactivar el usuario. Códigos posibles: USER_INACTIVE.",
+            description="No fue posible desactivar el cliente. Códigos posibles: CUSTOMER_INACTIVE.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token inválido, expirado o usuario no autenticado."
+            description="Token inválido, expirado o usuario no autenticado.",
         ),
         403: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="El usuario no tiene permiso para eliminar usuarios."
+            description="El usuario no tiene permiso para eliminar clientes.",
         ),
         404: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Usuario no encontrado."
+            description="Cliente no encontrado.",
         ),
     },
 )
 
-user_restore_schema = extend_schema(
-    tags=["Users"],
-    summary="Restaurar usuario",
-    description="Reactiva un usuario previamente desactivado.",
+customer_restore_schema = extend_schema(
+    tags=["Customers"],
+    summary="Restaurar cliente",
+    description="Reactiva un cliente previamente desactivado.",
     parameters=[
         OpenApiParameter(
             name="id",
             type=OpenApiTypes.INT,
             location=OpenApiParameter.PATH,
-            description="Identificador único del usuario a restaurar.",
+            description="Identificador único del cliente a restaurar.",
             required=True,
         )
     ],
     responses={
         200: OpenApiResponse(
             response=build_api_response_schema(
-                name="UserRestoreResponse",
-                data_serializer=UserDetailSerializer,
+                name="CustomerRestoreApiResponse",
+                data_serializer=CustomerDetailSerializer,
             ),
-            description="Usuario restaurado correctamente.",
+            description="Cliente restaurado correctamente.",
         ),
         400: OpenApiResponse(
             response=ValidationErrorResponseSerializer,
-            description="No fue posible restaurar el usuario.",
+            description="No fue posible restaurar el cliente.",
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Token inválido, expirado o usuario no autenticado."
+            description="Token inválido, expirado o usuario no autenticado.",
         ),
         403: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="El usuario no tiene permiso para restaurar usuarios."
+            description="El usuario no tiene permiso para restaurar clientes.",
         ),
         404: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Usuario no encontrado."
+            description="Cliente no encontrado.",
         ),
     },
 )
