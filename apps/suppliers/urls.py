@@ -1,15 +1,15 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from apps.customers.views.customer_viewset import CustomerViewSet
+from apps.suppliers.views.supplier_viewset import SupplierViewSet
 
 
 router = DefaultRouter()
 
 router.register(
-    r"customers",
-    CustomerViewSet,
-    basename="customers",
+    r"suppliers",
+    SupplierViewSet,
+    basename="suppliers",
 )
 
 

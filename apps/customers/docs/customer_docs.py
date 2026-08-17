@@ -134,9 +134,15 @@ customer_create_schema = extend_schema(
                 "document_number": "123456789",
                 "first_name": "Juan",
                 "last_name": "Pérez",
+                "business_name": "Distribuciones Pérez S.A.S.",
                 "email": "juan@example.com",
-                "phone_number": "3001234567",
-                "is_active": True
+                "movile": "3207250028",
+                "address": "Carrera 10 #20-30",
+                "city": "Bogotá",
+                "country": "Colombia",
+                "notes": "Cliente principal.",
+                "phone_number": "6027584282",
+                "is_active": True,
             },
         )
     ],

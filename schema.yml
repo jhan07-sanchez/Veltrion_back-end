@@ -48,7 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthLoginResponse'
+                $ref: '#/components/schemas/AuthLoginApiResponse'
           description: Inicio de sesión exitoso.
         '400':
           content:
@@ -61,7 +61,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Usuario o contraseña incorrectos.
+          description: 'Usuario o contraseña incorrectos. Código posible: AUTHENTICATION_FAILED.'
   /api/v1/auth/logout/:
     post:
       operationId: auth_logout_create
@@ -89,7 +89,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthLogoutResponse'
+                $ref: '#/components/schemas/AuthLogoutApiResponse'
           description: Sesión cerrada correctamente.
         '400':
           content:
@@ -119,14 +119,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthMeResponse'
+                $ref: '#/components/schemas/AuthMeApiResponse'
           description: Información del usuario autenticado.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Token inválido o expirado.
+          description: 'Token inválido o expirado. Código posible: AUTHENTICATION_FAILED.'
   /api/v1/auth/refresh/:
     post:
       operationId: auth_refresh_create
@@ -168,25 +168,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Token expirado o no válido para renovación.
+          description: 'Token expirado o no válido para renovación. Código posible:
+            AUTHENTICATION_FAILED.'
   /api/v1/customers/:
     get:
       operationId: customers_list
       description: Obtiene el listado paginado de clientes registrados en el sistema.
       summary: Listar clientes
       parameters:
-      - name: page
-        required: false
-        in: query
-        description: Un número de página dentro del conjunto de resultados paginado.
+      - in: query
+        name: page
         schema:
           type: integer
-      - name: page_size
-        required: false
-        in: query
-        description: Número de resultados a devolver por página.
+        description: Número de página para la paginación.
+      - in: query
+        name: page_size
         schema:
           type: integer
+        description: Cantidad de resultados por página.
       tags:
       - Customers
       security:
@@ -222,13 +221,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerDetail'
+              $ref: '#/components/schemas/CustomerCreate'
+            examples:
+              CrearCliente:
+                value:
+                  document_type: CC
+                  document_number: '123456789'
+                  first_name: Juan
+                  last_name: Pérez
+                  email: juan@example.com
+                  phone_number: '3001234567'
+                  is_active: true
+                summary: Crear Cliente
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CustomerDetail'
+              $ref: '#/components/schemas/CustomerCreate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CustomerDetail'
+              $ref: '#/components/schemas/CustomerCreate'
         required: true
       security:
       - jwtAuth: []
@@ -244,8 +254,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
-          description: Los datos enviados no son válidos.
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'Los datos enviados no son válidos. Códigos posibles: CUSTOMER_ALREADY_EXISTS.'
         '401':
           content:
             application/json:
@@ -264,6 +274,12 @@ paths:
       description: Obtiene la información detallada de un cliente mediante su identificador.
       summary: Obtener cliente
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del cliente.
+        required: true
       - in: path
         name: id_customer
         schema:
@@ -307,6 +323,12 @@ paths:
       summary: Actualizar cliente
       parameters:
       - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del cliente a actualizar.
+        required: true
+      - in: path
         name: id_customer
         schema:
           type: integer
@@ -319,13 +341,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerDetail'
+              $ref: '#/components/schemas/CustomerUpdate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CustomerDetail'
+              $ref: '#/components/schemas/CustomerUpdate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CustomerDetail'
+              $ref: '#/components/schemas/CustomerUpdate'
         required: true
       security:
       - jwtAuth: []
@@ -341,8 +363,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
-          description: Los datos enviados no son válidos.
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'Los datos enviados no son válidos. Códigos posibles: CUSTOMER_ALREADY_EXISTS.'
         '401':
           content:
             application/json:
@@ -367,6 +389,12 @@ paths:
       summary: Actualizar parcialmente cliente
       parameters:
       - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del cliente a actualizar parcialmente.
+        required: true
+      - in: path
         name: id_customer
         schema:
           type: integer
@@ -379,13 +407,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedCustomerDetail'
+              $ref: '#/components/schemas/PatchedCustomerUpdate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedCustomerDetail'
+              $ref: '#/components/schemas/PatchedCustomerUpdate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedCustomerDetail'
+              $ref: '#/components/schemas/PatchedCustomerUpdate'
       security:
       - jwtAuth: []
       - jwtAuth: []
@@ -400,8 +428,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
-          description: Los datos enviados no son válidos.
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'Los datos enviados no son válidos. Códigos posibles: CUSTOMER_ALREADY_EXISTS.'
         '401':
           content:
             application/json:
@@ -427,6 +455,12 @@ paths:
       summary: Desactivar cliente
       parameters:
       - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del cliente a desactivar.
+        required: true
+      - in: path
         name: id_customer
         schema:
           type: integer
@@ -449,8 +483,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
-          description: No fue posible desactivar el cliente.
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'No fue posible desactivar el cliente. Códigos posibles: CUSTOMER_INACTIVE.'
         '401':
           content:
             application/json:
@@ -475,6 +509,12 @@ paths:
       description: Reactiva un cliente previamente desactivado.
       summary: Restaurar cliente
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del cliente a restaurar.
+        required: true
       - in: path
         name: id_customer
         schema:
@@ -510,7 +550,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                $ref: '#/components/schemas/ValidationErrorResponse'
           description: No fue posible restaurar el cliente.
         '401':
           content:
@@ -533,21 +573,20 @@ paths:
   /api/v1/roles/:
     get:
       operationId: roles_list
-      description: Obtiene el listado de todos los roles registrados en el sistema.
+      description: Obtiene el listado paginado de todos los roles registrados en el
+        sistema.
       summary: Listar roles
       parameters:
-      - name: page
-        required: false
-        in: query
-        description: Un número de página dentro del conjunto de resultados paginado.
+      - in: query
+        name: page
         schema:
           type: integer
-      - name: page_size
-        required: false
-        in: query
-        description: Número de resultados a devolver por página.
+        description: Número de página para la paginación.
+      - in: query
+        name: page_size
         schema:
           type: integer
+        description: Cantidad de resultados por página.
       tags:
       - Roles
       security:
@@ -559,22 +598,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedRoleListResponseList'
-          description: Listado de roles.
+          description: Listado de roles obtenido correctamente.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para consultar roles.
     post:
       operationId: roles_create
-      description: Crea un nuevo rol dentro del sistema.
+      description: Crea un nuevo rol dentro del sistema. El campo 'permissions' recibe
+        un JSON con los permisos activos del rol basado en el SecurityRegistry.
       summary: Crear rol
       tags:
       - Roles
@@ -589,6 +629,10 @@ paths:
                   role_name: Administrador
                   role_description: Control total del sistema
                   is_active: true
+                  permissions:
+                    users.view: true
+                    users.create: true
+                    customers.view: true
                 summary: Crear Rol
           application/x-www-form-urlencoded:
             schema:
@@ -612,25 +656,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos de validación.
+          description: 'Datos inválidos. Códigos posibles: ROLE_ALREADY_EXISTS, INVALID_ROLE_PERMISSIONS.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para crear roles.
   /api/v1/roles/{id_role}/:
     get:
       operationId: roles_retrieve
-      description: Obtiene la información detallada de un rol.
+      description: Obtiene la información detallada de un rol específico.
       summary: Obtener rol
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del rol.
+        required: true
       - in: path
         name: id_role
         schema:
@@ -649,19 +699,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RoleDetailResponse'
-          description: Información del rol.
+          description: Información del rol obtenida correctamente.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para consultar roles.
         '404':
           content:
             application/json:
@@ -673,6 +723,12 @@ paths:
       description: Actualiza completamente un rol.
       summary: Actualizar rol
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del rol a actualizar.
+        required: true
       - in: path
         name: id_role
         schema:
@@ -709,19 +765,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos.
+          description: 'Datos inválidos. Códigos posibles: ROLE_ALREADY_EXISTS, INVALID_ROLE_PERMISSIONS.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para actualizar roles.
         '404':
           content:
             application/json:
@@ -733,6 +789,12 @@ paths:
       description: Actualiza uno o varios campos de un rol.
       summary: Actualizar parcialmente un rol
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del rol a actualizar parcialmente.
+        required: true
       - in: path
         name: id_role
         schema:
@@ -768,19 +830,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos.
+          description: 'Datos inválidos. Códigos posibles: ROLE_ALREADY_EXISTS, INVALID_ROLE_PERMISSIONS.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para actualizar roles.
         '404':
           content:
             application/json:
@@ -792,6 +854,12 @@ paths:
       description: Realiza el borrado lógico del rol.
       summary: Desactivar rol
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del rol a desactivar.
+        required: true
       - in: path
         name: id_role
         schema:
@@ -811,18 +879,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoleDeleteResponse'
           description: Rol desactivado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'No fue posible desactivar el rol. Códigos posibles: ROLE_INACTIVE.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para eliminar roles.
         '404':
           content:
             application/json:
@@ -835,6 +909,12 @@ paths:
       description: Reactiva un rol previamente desactivado.
       summary: Restaurar rol
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del rol a restaurar.
+        required: true
       - in: path
         name: id_role
         schema:
@@ -866,18 +946,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoleRestoreResponse'
           description: Rol restaurado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: No fue posible restaurar el rol.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para restaurar roles.
         '404':
           content:
             application/json:
@@ -923,7 +1009,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SecurityDashboardResponse'
+                $ref: '#/components/schemas/SecurityDashboardApiResponse'
           description: Dashboard obtenido correctamente.
         '401':
           content:
@@ -947,7 +1033,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SecurityNavigationResponse'
+                $ref: '#/components/schemas/SecurityNavigationApiResponse'
           description: Navegación obtenida correctamente.
         '401':
           content:
@@ -971,7 +1057,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SecurityPermissionCatalogResponse'
+                $ref: '#/components/schemas/SecurityPermissionCatalogApiResponse'
           description: Catálogo de permisos obtenido correctamente.
         '401':
           content:
@@ -979,24 +1065,429 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
           description: Token inválido o expirado.
+  /api/v1/suppliers/:
+    get:
+      operationId: suppliers_list
+      description: Obtiene el listado paginado de proveedores registrados en el sistema.
+      summary: Listar proveedores
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Número de página para la paginación.
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+        description: Cantidad de resultados por página.
+      tags:
+      - Suppliers
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSupplierListApiResponseList'
+          description: Proveedores obtenidos correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para consultar proveedores.
+    post:
+      operationId: suppliers_create
+      description: Registra un nuevo proveedor en el sistema. El número de documento
+        debe ser único.
+      summary: Crear proveedor
+      tags:
+      - Suppliers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierCreate'
+            examples:
+              CrearProveedor:
+                value:
+                  document_type: NIT
+                  document_number: 900123456-7
+                  first_name: Carlos
+                  last_name: Gómez
+                  business_name: Distribuciones Gómez S.A.S.
+                  email: contacto@distribucionesgomez.com
+                  phone: '6011234567'
+                  mobile: '3001234567'
+                  address: 'Carrera 10 #20-30'
+                  city: Bogotá
+                  country: Colombia
+                  notes: Proveedor principal.
+                  is_active: true
+                summary: Crear proveedor
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupplierCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SupplierCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierCreateApiResponse'
+          description: Proveedor creado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'Los datos enviados no son válidos. Código posible: SUPPLIER_ALREADY_EXISTS.'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para crear proveedores.
+  /api/v1/suppliers/{id_supplier}/:
+    get:
+      operationId: suppliers_retrieve
+      description: Obtiene la información detallada de un proveedor mediante su identificador.
+      summary: Obtener proveedor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del proveedor.
+        required: true
+      - in: path
+        name: id_supplier
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este proveedor.
+        required: true
+      tags:
+      - Suppliers
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierDetailApiResponse'
+          description: Proveedor obtenido correctamente.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para consultar proveedores.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Proveedor no encontrado.
+    put:
+      operationId: suppliers_update
+      description: Actualiza completamente la información de un proveedor existente.
+      summary: Actualizar proveedor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del proveedor a actualizar.
+        required: true
+      - in: path
+        name: id_supplier
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este proveedor.
+        required: true
+      tags:
+      - Suppliers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupplierUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SupplierUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierUpdateApiResponse'
+          description: Proveedor actualizado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'Los datos enviados no son válidos. Código posible: SUPPLIER_ALREADY_EXISTS.'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para actualizar proveedores.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Proveedor no encontrado.
+    patch:
+      operationId: suppliers_partial_update
+      description: Actualiza parcialmente la información de un proveedor existente.
+      summary: Actualizar parcialmente proveedor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del proveedor a actualizar parcialmente.
+        required: true
+      - in: path
+        name: id_supplier
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este proveedor.
+        required: true
+      tags:
+      - Suppliers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplierUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplierUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplierUpdate'
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierPartialUpdateApiResponse'
+          description: Proveedor actualizado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'Los datos enviados no son válidos. Código posible: SUPPLIER_ALREADY_EXISTS.'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para actualizar proveedores.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Proveedor no encontrado.
+    delete:
+      operationId: suppliers_destroy
+      description: Desactiva lógicamente un proveedor. El registro no se elimina físicamente
+        de la base de datos.
+      summary: Desactivar proveedor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del proveedor a desactivar.
+        required: true
+      - in: path
+        name: id_supplier
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este proveedor.
+        required: true
+      tags:
+      - Suppliers
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierDeleteApiResponse'
+          description: Proveedor desactivado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'No fue posible desactivar el proveedor. Código posible: SUPPLIER_INACTIVE.'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para eliminar proveedores.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Proveedor no encontrado.
+  /api/v1/suppliers/{id_supplier}/restore/:
+    post:
+      operationId: suppliers_restore_create
+      description: Reactiva un proveedor previamente desactivado.
+      summary: Restaurar proveedor
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del proveedor a restaurar.
+        required: true
+      - in: path
+        name: id_supplier
+        schema:
+          type: integer
+          title: ID
+        description: Un valor de entero único que identifique este proveedor.
+        required: true
+      tags:
+      - Suppliers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupplierDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SupplierDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierRestoreApiResponse'
+          description: Proveedor restaurado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: No fue posible restaurar el proveedor.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Token inválido, expirado o usuario no autenticado.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: El usuario no tiene permiso para restaurar proveedores.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+          description: Proveedor no encontrado.
   /api/v1/user-roles/:
     get:
       operationId: user_roles_list
-      description: Obtiene el listado de todas las asignaciones de roles a usuarios.
+      description: Obtiene el listado paginado de todas las asignaciones de roles
+        a usuarios.
       summary: Listar asignaciones de roles
       parameters:
-      - name: page
-        required: false
-        in: query
-        description: Un número de página dentro del conjunto de resultados paginado.
+      - in: query
+        name: page
         schema:
           type: integer
-      - name: page_size
-        required: false
-        in: query
-        description: Número de resultados a devolver por página.
+        description: Número de página para la paginación.
+      - in: query
+        name: page_size
         schema:
           type: integer
+        description: Cantidad de resultados por página.
       tags:
       - User Roles
       security:
@@ -1008,19 +1499,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedUserRoleListResponseList'
-          description: Listado de asignaciones de roles.
+          description: Listado de asignaciones de roles obtenido correctamente.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para consultar asignaciones.
     post:
       operationId: user_roles_create
       description: Crea una nueva asignación de rol a un usuario.
@@ -1032,6 +1523,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UserRoleCreate'
+            examples:
+              AsignarRol:
+                value:
+                  user: 1
+                  role: 2
+                summary: Asignar Rol
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/UserRoleCreate'
@@ -1054,25 +1551,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos de validación.
+          description: 'Datos inválidos. Códigos posibles: USER_ROLE_ALREADY_EXISTS,
+            ROLE_INACTIVE, USER_INACTIVE.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para crear asignaciones.
   /api/v1/user-roles/{id_user_role}/:
     get:
       operationId: user_roles_retrieve
       description: Obtiene la información detallada de una asignación de rol.
       summary: Obtener asignación de rol
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único de la asignación.
+        required: true
       - in: path
         name: id_user_role
         schema:
@@ -1091,19 +1595,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserRoleDetailResponse'
-          description: Información de la asignación.
+          description: Información de la asignación obtenida correctamente.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para consultar asignaciones.
         '404':
           content:
             application/json:
@@ -1115,6 +1619,12 @@ paths:
       description: Actualiza completamente una asignación de rol.
       summary: Actualizar asignación
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único de la asignación a actualizar.
+        required: true
       - in: path
         name: id_user_role
         schema:
@@ -1151,19 +1661,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos.
+          description: 'Datos inválidos. Códigos posibles: USER_ROLE_ALREADY_EXISTS,
+            ROLE_INACTIVE, USER_INACTIVE.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para actualizar asignaciones.
         '404':
           content:
             application/json:
@@ -1175,6 +1686,12 @@ paths:
       description: Actualiza uno o varios campos de una asignación.
       summary: Actualizar parcialmente una asignación
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único de la asignación a actualizar parcialmente.
+        required: true
       - in: path
         name: id_user_role
         schema:
@@ -1210,19 +1727,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos.
+          description: 'Datos inválidos. Códigos posibles: USER_ROLE_ALREADY_EXISTS,
+            ROLE_INACTIVE, USER_INACTIVE.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para actualizar asignaciones.
         '404':
           content:
             application/json:
@@ -1234,6 +1752,12 @@ paths:
       description: Realiza el borrado lógico de la asignación.
       summary: Desactivar asignación
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único de la asignación a desactivar.
+        required: true
       - in: path
         name: id_user_role
         schema:
@@ -1253,18 +1777,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRoleDeleteResponse'
           description: Asignación desactivada correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: No fue posible desactivar la asignación.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para eliminar asignaciones.
         '404':
           content:
             application/json:
@@ -1277,6 +1807,12 @@ paths:
       description: Reactiva una asignación previamente desactivada.
       summary: Restaurar asignación
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único de la asignación a restaurar.
+        required: true
       - in: path
         name: id_user_role
         schema:
@@ -1308,18 +1844,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRoleRestoreResponse'
           description: Asignación restaurada correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: No fue posible restaurar la asignación.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para restaurar asignaciones.
         '404':
           content:
             application/json:
@@ -1329,21 +1871,20 @@ paths:
   /api/v1/users/:
     get:
       operationId: users_list
-      description: Obtiene el listado de todos los usuarios registrados en el sistema.
+      description: Obtiene el listado paginado de todos los usuarios registrados en
+        el sistema.
       summary: Listar usuarios
       parameters:
-      - name: page
-        required: false
-        in: query
-        description: Un número de página dentro del conjunto de resultados paginado.
+      - in: query
+        name: page
         schema:
           type: integer
-      - name: page_size
-        required: false
-        in: query
-        description: Número de resultados a devolver por página.
+        description: Número de página para la paginación.
+      - in: query
+        name: page_size
         schema:
           type: integer
+        description: Cantidad de resultados por página.
       tags:
       - Users
       security:
@@ -1355,22 +1896,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedUserListResponseList'
-          description: Listado de usuarios.
+          description: Listado de usuarios obtenido correctamente.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para consultar usuarios.
     post:
       operationId: users_create
-      description: Crea un nuevo usuario dentro del sistema.
+      description: Crea un nuevo usuario dentro del sistema. El nombre de usuario,
+        correo electrónico y número de documento deben ser únicos.
       summary: Crear usuario
       tags:
       - Users
@@ -1412,25 +1954,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos de validación.
+          description: 'Datos inválidos. Códigos posibles: USER_ALREADY_EXISTS, EMAIL_ALREADY_EXISTS,
+            DOCUMENT_ALREADY_EXISTS.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para crear usuarios.
   /api/v1/users/{id_user}/:
     get:
       operationId: users_retrieve
-      description: Obtiene toda la informacion de un usuario especifico.
+      description: Obtiene toda la información detallada de un usuario específico.
       summary: Obtener usuario
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del usuario.
+        required: true
       - in: path
         name: id_user
         schema:
@@ -1449,19 +1998,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDetailResponse'
-          description: Informacion del usuario.
+          description: Información del usuario obtenida correctamente.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para consultar usuarios.
         '404':
           content:
             application/json:
@@ -1470,9 +2019,15 @@ paths:
           description: Usuario no encontrado.
     put:
       operationId: users_update
-      description: Actualiza completamente un usuario.
+      description: Actualiza completamente un usuario existente.
       summary: Actualizar usuario
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del usuario a actualizar.
+        required: true
       - in: path
         name: id_user
         schema:
@@ -1509,19 +2064,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos.
+          description: 'Datos inválidos. Códigos posibles: USER_ALREADY_EXISTS, EMAIL_ALREADY_EXISTS,
+            DOCUMENT_ALREADY_EXISTS.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para actualizar usuarios.
         '404':
           content:
             application/json:
@@ -1530,9 +2086,15 @@ paths:
           description: Usuario no encontrado.
     patch:
       operationId: users_partial_update
-      description: Actualiza uno o varios campos del usuario.
+      description: Actualiza uno o varios campos de un usuario existente.
       summary: Actualizar parcialmente un usuario
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del usuario a actualizar parcialmente.
+        required: true
       - in: path
         name: id_user
         schema:
@@ -1568,19 +2130,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
-          description: Datos inválidos.
+          description: 'Datos inválidos. Códigos posibles: USER_ALREADY_EXISTS, EMAIL_ALREADY_EXISTS,
+            DOCUMENT_ALREADY_EXISTS.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para actualizar usuarios.
         '404':
           content:
             application/json:
@@ -1593,6 +2156,12 @@ paths:
         registro.
       summary: Desactivar usuario
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del usuario a desactivar.
+        required: true
       - in: path
         name: id_user
         schema:
@@ -1612,18 +2181,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserDeleteResponse'
           description: Usuario desactivado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: 'No fue posible desactivar el usuario. Códigos posibles: USER_INACTIVE.'
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para eliminar usuarios.
         '404':
           content:
             application/json:
@@ -1636,6 +2211,12 @@ paths:
       description: Reactiva un usuario previamente desactivado.
       summary: Restaurar usuario
       parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Identificador único del usuario a restaurar.
+        required: true
       - in: path
         name: id_user
         schema:
@@ -1667,18 +2248,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRestoreResponse'
           description: Usuario restaurado correctamente.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: No fue posible restaurar el usuario.
         '401':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: No autenticado.
+          description: Token inválido, expirado o usuario no autenticado.
         '403':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorResponse'
-          description: Permisos denegados.
+          description: El usuario no tiene permiso para restaurar usuarios.
         '404':
           content:
             application/json:
@@ -1727,7 +2314,7 @@ components:
       required:
       - password
       - username
-    AuthLoginResponse:
+    AuthLoginApiResponse:
       type: object
       description: Respuesta estandarizada de la API.
       properties:
@@ -1765,7 +2352,7 @@ components:
           type: string
       required:
       - refresh
-    AuthLogoutResponse:
+    AuthLogoutApiResponse:
       type: object
       description: Respuesta estandarizada de la API.
       properties:
@@ -1793,7 +2380,7 @@ components:
           description: Datos dinámicos de la respuesta.
       required:
       - data
-    AuthMeResponse:
+    AuthMeApiResponse:
       type: object
       description: Respuesta estandarizada de la API.
       properties:
@@ -1869,6 +2456,89 @@ components:
           description: Nuevo Access Token.
       required:
       - access
+    CustomerCreate:
+      type: object
+      description: |-
+        Serializer utlizado para crear un cliente.
+
+        La persistencia es delegada al CustomerService para
+        mantener separadas las responsabilidades.
+      properties:
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del cliente (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          title: Número de Documento
+          description: Número único de identidad del cliente.
+          maxLength: 30
+        first_name:
+          type: string
+          title: Nombres
+          maxLength: 100
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 100
+        business_name:
+          type: string
+          title: Razón Social
+          description: Nombre de la empresa o razón social del cliente.
+          maxLength: 200
+        email:
+          title: Correo Electrónico
+          description: Correo electrónico del cliente.
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          title: Teléfono
+          description: Número de teléfono del cliente.
+          maxLength: 30
+        mobile:
+          type: string
+          title: Celular
+          description: Número de celular del cliente.
+          maxLength: 30
+        address:
+          type: string
+          title: Dirección
+          description: Dirección física del cliente.
+          maxLength: 255
+        city:
+          type: string
+          title: Ciudad
+          description: Ciudad de residencia del cliente.
+          maxLength: 100
+        country:
+          type: string
+          title: País
+          description: País de residencia del cliente.
+          maxLength: 100
+        notes:
+          type: string
+          title: Notas
+          description: Notas adicionales sobre el cliente.
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el cliente está activo en el sistema.
+      required:
+      - document_number
+      - document_type
     CustomerCreateApiResponse:
       type: object
       description: Respuesta estandarizada de la API.
@@ -2209,6 +2879,89 @@ components:
           description: Objeto de resultado.
       required:
       - data
+    CustomerUpdate:
+      type: object
+      description: |-
+        Serializer utlizado para actualizar un cliente.
+
+        La persistencia es delegada al CustomerService para
+        mantener separadas las responsabilidades.
+      properties:
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del cliente (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          title: Número de Documento
+          description: Número único de identidad del cliente.
+          maxLength: 30
+        first_name:
+          type: string
+          title: Nombres
+          maxLength: 100
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 100
+        business_name:
+          type: string
+          title: Razón Social
+          description: Nombre de la empresa o razón social del cliente.
+          maxLength: 200
+        email:
+          title: Correo Electrónico
+          description: Correo electrónico del cliente.
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          title: Teléfono
+          description: Número de teléfono del cliente.
+          maxLength: 30
+        mobile:
+          type: string
+          title: Celular
+          description: Número de celular del cliente.
+          maxLength: 30
+        address:
+          type: string
+          title: Dirección
+          description: Dirección física del cliente.
+          maxLength: 255
+        city:
+          type: string
+          title: Ciudad
+          description: Ciudad de residencia del cliente.
+          maxLength: 100
+        country:
+          type: string
+          title: País
+          description: País de residencia del cliente.
+          maxLength: 100
+        notes:
+          type: string
+          title: Notas
+          description: Notas adicionales sobre el cliente.
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el cliente está activo en el sistema.
+      required:
+      - document_number
+      - document_type
     CustomerUpdateApiResponse:
       type: object
       description: Respuesta estandarizada de la API.
@@ -2379,6 +3132,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RoleListResponse'
+    PaginatedSupplierListApiResponseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupplierListApiResponse'
     PaginatedUserListResponseList:
       type: object
       required:
@@ -2425,14 +3201,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserRoleListResponse'
-    PatchedCustomerDetail:
+    PatchedCustomerUpdate:
       type: object
-      description: Serializer utlizado para consultar el detalle completo de un cliente.
+      description: |-
+        Serializer utlizado para actualizar un cliente.
+
+        La persistencia es delegada al CustomerService para
+        mantener separadas las responsabilidades.
       properties:
-        id_customer:
-          type: integer
-          readOnly: true
-          title: ID
         document_type:
           allOf:
           - $ref: '#/components/schemas/DocumentTypeEnum'
@@ -2505,16 +3281,6 @@ components:
           type: boolean
           title: Estado
           description: Indica si el cliente está activo en el sistema.
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-          title: Fecha de creación
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-          title: Fecha de actualización
     PatchedRoleUpdate:
       type: object
       description: Serializer utilizado para actualizar un rol existente.
@@ -2536,6 +3302,86 @@ components:
           type: boolean
           title: Estado
           description: Indica si el registro está activo.
+    PatchedSupplierUpdate:
+      type: object
+      description: |-
+        Serializer utilizado para actualizar un proveedor.
+
+        La persistencia es delegada al SupplierService para mantener
+        separadas las responsabilidades.
+      properties:
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del proveedor (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          title: Número de Documento
+          description: Número único de identificación del proveedor.
+          maxLength: 30
+        first_name:
+          type: string
+          title: Nombres
+          maxLength: 100
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 100
+        business_name:
+          type: string
+          title: Razón Social
+          description: Nombre de la empresa o razón social del proveedor.
+          maxLength: 200
+        email:
+          title: Correo Electrónico
+          description: Correo electrónico del proveedor.
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          title: Teléfono
+          description: Número de teléfono del proveedor.
+          maxLength: 30
+        mobile:
+          type: string
+          title: Celular
+          description: Número de celular del proveedor.
+          maxLength: 30
+        address:
+          type: string
+          title: Dirección
+          description: Dirección física del proveedor.
+          maxLength: 255
+        city:
+          type: string
+          title: Ciudad
+          description: Ciudad de ubicación del proveedor.
+          maxLength: 100
+        country:
+          type: string
+          title: País
+          description: País de ubicación del proveedor.
+          maxLength: 100
+        notes:
+          type: string
+          title: Notas
+          description: Notas adicionales sobre el proveedor.
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el proveedor está activo en el sistema.
     PatchedUserRoleUpdate:
       type: object
       description: |-
@@ -2987,7 +3833,7 @@ components:
       - actions
       - permissions
       - roles
-    SecurityDashboardResponse:
+    SecurityDashboardApiResponse:
       type: object
       description: Respuesta estandarizada de la API.
       properties:
@@ -3014,7 +3860,7 @@ components:
           description: Objeto de resultado.
       required:
       - data
-    SecurityNavigationResponse:
+    SecurityNavigationApiResponse:
       type: object
       description: Respuesta estandarizada de la API.
       properties:
@@ -3041,7 +3887,7 @@ components:
           description: Objeto de resultado.
       required:
       - data
-    SecurityPermissionCatalogResponse:
+    SecurityPermissionCatalogApiResponse:
       type: object
       description: Respuesta estandarizada de la API.
       properties:
@@ -3065,6 +3911,542 @@ components:
         data:
           allOf:
           - $ref: '#/components/schemas/PermissionCatalogResponse'
+          description: Objeto de resultado.
+      required:
+      - data
+    SupplierCreate:
+      type: object
+      description: |-
+        Serializer utilizado para crear un proveedor.
+
+        La persistencia es delegada al SupplierService para mantener
+        separadas las responsabilidades.
+      properties:
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del proveedor (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          title: Número de Documento
+          description: Número único de identificación del proveedor.
+          maxLength: 30
+        first_name:
+          type: string
+          title: Nombres
+          maxLength: 100
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 100
+        business_name:
+          type: string
+          title: Razón Social
+          description: Nombre de la empresa o razón social del proveedor.
+          maxLength: 200
+        email:
+          title: Correo Electrónico
+          description: Correo electrónico del proveedor.
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          title: Teléfono
+          description: Número de teléfono del proveedor.
+          maxLength: 30
+        mobile:
+          type: string
+          title: Celular
+          description: Número de celular del proveedor.
+          maxLength: 30
+        address:
+          type: string
+          title: Dirección
+          description: Dirección física del proveedor.
+          maxLength: 255
+        city:
+          type: string
+          title: Ciudad
+          description: Ciudad de ubicación del proveedor.
+          maxLength: 100
+        country:
+          type: string
+          title: País
+          description: País de ubicación del proveedor.
+          maxLength: 100
+        notes:
+          type: string
+          title: Notas
+          description: Notas adicionales sobre el proveedor.
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el proveedor está activo en el sistema.
+      required:
+      - document_number
+      - document_type
+    SupplierCreateApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/SupplierDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    SupplierDeleteApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Datos dinámicos de la respuesta.
+      required:
+      - data
+    SupplierDetail:
+      type: object
+      description: |-
+        Serializer utilizado para consultar el detalle completo
+        de un proveedor.
+      properties:
+        id_supplier:
+          type: integer
+          readOnly: true
+          title: ID
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del proveedor (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          title: Número de Documento
+          description: Número único de identificación del proveedor.
+          maxLength: 30
+        first_name:
+          type: string
+          title: Nombres
+          maxLength: 100
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 100
+        business_name:
+          type: string
+          title: Razón Social
+          description: Nombre de la empresa o razón social del proveedor.
+          maxLength: 200
+        email:
+          title: Correo Electrónico
+          description: Correo electrónico del proveedor.
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          title: Teléfono
+          description: Número de teléfono del proveedor.
+          maxLength: 30
+        mobile:
+          type: string
+          title: Celular
+          description: Número de celular del proveedor.
+          maxLength: 30
+        address:
+          type: string
+          title: Dirección
+          description: Dirección física del proveedor.
+          maxLength: 255
+        city:
+          type: string
+          title: Ciudad
+          description: Ciudad de ubicación del proveedor.
+          maxLength: 100
+        country:
+          type: string
+          title: País
+          description: País de ubicación del proveedor.
+          maxLength: 100
+        notes:
+          type: string
+          title: Notas
+          description: Notas adicionales sobre el proveedor.
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el proveedor está activo en el sistema.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de creación
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de actualización
+      required:
+      - created_at
+      - document_number
+      - document_type
+      - id_supplier
+      - updated_at
+    SupplierDetailApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/SupplierDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    SupplierList:
+      type: object
+      description: |-
+        Serializer utilizado para listar proveedores.
+
+        Expone únicamente la información necesaria para las tablas
+        y listados del sistema.
+      properties:
+        id_supplier:
+          type: integer
+          readOnly: true
+          title: ID
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          readOnly: true
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del proveedor (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          readOnly: true
+          title: Número de Documento
+          description: Número único de identificación del proveedor.
+        first_name:
+          type: string
+          readOnly: true
+          title: Nombres
+        last_name:
+          type: string
+          readOnly: true
+          title: Apellidos
+        business_name:
+          type: string
+          readOnly: true
+          title: Razón Social
+          description: Nombre de la empresa o razón social del proveedor.
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Correo Electrónico
+          description: Correo electrónico del proveedor.
+        phone:
+          type: string
+          readOnly: true
+          title: Teléfono
+          description: Número de teléfono del proveedor.
+        mobile:
+          type: string
+          readOnly: true
+          title: Celular
+          description: Número de celular del proveedor.
+        city:
+          type: string
+          readOnly: true
+          title: Ciudad
+          description: Ciudad de ubicación del proveedor.
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Estado
+          description: Indica si el proveedor está activo en el sistema.
+      required:
+      - business_name
+      - city
+      - document_number
+      - document_type
+      - email
+      - first_name
+      - id_supplier
+      - is_active
+      - last_name
+      - mobile
+      - phone
+    SupplierListApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupplierList'
+          description: Lista de resultados.
+      required:
+      - data
+    SupplierPartialUpdateApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/SupplierDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    SupplierRestoreApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/SupplierDetail'
+          description: Objeto de resultado.
+      required:
+      - data
+    SupplierUpdate:
+      type: object
+      description: |-
+        Serializer utilizado para actualizar un proveedor.
+
+        La persistencia es delegada al SupplierService para mantener
+        separadas las responsabilidades.
+      properties:
+        document_type:
+          allOf:
+          - $ref: '#/components/schemas/DocumentTypeEnum'
+          title: Tipo de Documento
+          description: |-
+            Tipo de documento del proveedor (CC, NIT, CE, PAS, TI).
+
+            * `CC` - Cédula de Ciudadanía
+            * `NIT` - Número de Identificación Tributaria
+            * `CE` - Cédula de Extranjería
+            * `PAS` - Pasaporte
+            * `TI` - Tarjeta de Identidad
+        document_number:
+          type: string
+          title: Número de Documento
+          description: Número único de identificación del proveedor.
+          maxLength: 30
+        first_name:
+          type: string
+          title: Nombres
+          maxLength: 100
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 100
+        business_name:
+          type: string
+          title: Razón Social
+          description: Nombre de la empresa o razón social del proveedor.
+          maxLength: 200
+        email:
+          title: Correo Electrónico
+          description: Correo electrónico del proveedor.
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          title: Teléfono
+          description: Número de teléfono del proveedor.
+          maxLength: 30
+        mobile:
+          type: string
+          title: Celular
+          description: Número de celular del proveedor.
+          maxLength: 30
+        address:
+          type: string
+          title: Dirección
+          description: Dirección física del proveedor.
+          maxLength: 255
+        city:
+          type: string
+          title: Ciudad
+          description: Ciudad de ubicación del proveedor.
+          maxLength: 100
+        country:
+          type: string
+          title: País
+          description: País de ubicación del proveedor.
+          maxLength: 100
+        notes:
+          type: string
+          title: Notas
+          description: Notas adicionales sobre el proveedor.
+        is_active:
+          type: boolean
+          title: Estado
+          description: Indica si el proveedor está activo en el sistema.
+      required:
+      - document_number
+      - document_type
+    SupplierUpdateApiResponse:
+      type: object
+      description: Respuesta estandarizada de la API.
+      properties:
+        success:
+          type: boolean
+          default: true
+          description: Indica si la operación fue exitosa.
+        code:
+          type: string
+          default: SUCCESS
+          description: Código interno del resultado de la operación.
+        message:
+          type: string
+          default: Operación exitosa.
+          description: Mensaje descriptivo del resultado.
+        errors:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          description: Detalle de errores si success es false.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/SupplierDetail'
           description: Objeto de resultado.
       required:
       - data

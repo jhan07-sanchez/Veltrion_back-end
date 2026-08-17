@@ -105,3 +105,21 @@ class CustomerAlreadyExistsException(BusinessException):
 class CustomerInactiveException(BusinessException):
     default_detail = "El cliente se encuentra inactivo."
     default_code = ErrorCodes.CUSTOMER_INACTIVE
+
+
+
+class SupplierAlreadyExistsException(BusinessException):
+    """
+    Se lanza cuando ya existe un proveedor
+    con el mismo numero de documento.
+    """
+    default_detail = "El proveedor ya existe."
+    default_code = ErrorCodes.SUPPLIER_ALREADY_EXISTS
+
+
+class SupplierInactiveException(BusinessException):
+    """
+    Se lanza cuando el proveedor se encuentra inactivo.
+    """
+    default_detail = "El proveedor se encuentra inactivo."
+    default_code = ErrorCodes.SUPPLIER_INACTIVE
