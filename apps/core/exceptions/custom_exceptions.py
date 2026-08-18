@@ -123,3 +123,20 @@ class SupplierInactiveException(BusinessException):
     """
     default_detail = "El proveedor se encuentra inactivo."
     default_code = ErrorCodes.SUPPLIER_INACTIVE
+
+
+
+class CategoryAlreadyExistsException(BusinessException):
+    """
+    Se lanza cuando ya existe una categoria
+    """
+    default_detail = "La categoria ya existe."
+    default_code = ErrorCodes.CATEGORY_ALREADY_EXISTS
+
+
+class CategoryInactiveException(BusinessException):
+    """
+    Se lanza cuando una categoria se encuentra inactiva
+    """
+    default_detail = "La categoria de encuentra Inactiva."
+    default_code = ErrorCodes.CATEGORY_INACTIVE
