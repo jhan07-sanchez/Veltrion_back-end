@@ -12,12 +12,15 @@ class CategoryListSerializer(serializers.ModelSerializer):
     y listados del sistema.
     """
 
+    parent_name = serializers.CharField(source="parent.name", read_only=True)
     class Meta:
         model = Category
         fields = (
             "id_category",
             "name",
             "description",
+            "parent",
+            "parent_name",
             "is_active",
         )
 
@@ -37,6 +40,7 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "is_active",
+            "parent",
             "created_at",
             "updated_at",
         )
@@ -61,6 +65,7 @@ class CategoryCreateSerializer(serializers.ModelSerializer):
         fields = (
             "name",
             "description",
+            "parent",
             "is_active",
         )
 
@@ -87,6 +92,7 @@ class CategoryUpdateSerializer(serializers.ModelSerializer):
         fields = (
             "name",
             "description",
+            "parent",
             "is_active",
         )
 
