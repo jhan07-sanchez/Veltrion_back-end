@@ -26,6 +26,9 @@ los permisos del usuario.
 from __future__ import annotations
 
 from apps.core.security.registry import SecurityRegistry
+from apps.core.security.services.dashboard_metrics_service import (
+    DashboardMetricsService,
+)
 
 
 class DashboardBuilder:
@@ -70,4 +73,6 @@ class DashboardBuilder:
             if has_access:
                 visible_widgets.extend(module.widgets)
 
-        return {"widgets": visible_widgets}
+        widgets_data = DashboardMetricsService.get_metrics(visible_widgets)
+
+        return {"widgets": widgets_data}

@@ -34,7 +34,7 @@ SECURITY_MODULES = [
         "parent": None,
         "permissions": {"dashboard.view": "Ver dashboard"},
         "actions": {"dashboard.refresh": "Refrescar datos"},
-        "widgets": [],
+        "widgets": ["erp_activity", "needs_attention", "top_selling_products", "latest_sales"],
         "order": 0,
     },
     {
@@ -197,7 +197,7 @@ SECURITY_MODULES = [
             "purchases.cancel": "Cancelar compras",
             "purchases.print": "Imprimir compras",
         },
-        "widgets": ["purchases_pending", "purchases_monthly"],
+        "widgets": ["purchases_pending", "purchases_monthly", "purchases_summary"],
         "order": 1,
     },
     {

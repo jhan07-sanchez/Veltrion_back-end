@@ -23,6 +23,7 @@ from apps.users.services.auth_service import AuthService
 class AuthLoginView(APIView):
     """Endpoint encargado del inicio de sesión."""
 
+    authentication_classes = []
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_login"
@@ -72,6 +73,7 @@ class MeView(APIView):
 class AuthRefreshView(APIView):
     """Endpoint para renovar el Access Token."""
 
+    authentication_classes = []
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_refresh"
