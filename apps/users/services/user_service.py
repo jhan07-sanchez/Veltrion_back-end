@@ -62,6 +62,8 @@ class UserService(BaseService[User]):
 
     def perform_create(self, data: dict) -> User:
         password = data.pop("password")
+        if "email" in data and data["email"]:
+            data["email"] = data["email"].strip().lower()
         user = User(**data)
         user.set_password(password)
         user.full_clean()
@@ -70,6 +72,9 @@ class UserService(BaseService[User]):
 
     def perform_update(self, instance: User, data: dict) -> User:
         password = data.pop("password", None)
+        
+        if "email" in data and data["email"]:
+            data["email"] = data["email"].strip().lower()
 
         for field, value in data.items():
             setattr(instance, field, value)

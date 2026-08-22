@@ -96,6 +96,12 @@ class UserCreateSerializer(serializers.ModelSerializer):
             "document_number": {"validators": []},
         }
 
+    def validate_phone_number(self, value):
+        # Convierte "" o cadenas de puros espacios a None (NULL en BD)
+        if value is not None and value.strip() == "":
+            return None
+        return value
+
 
 # Serializer para actualizar usuarios
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -115,3 +121,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             "email": {"validators": []},
             "document_number": {"validators": []},
         }
+
+
+    def validate_phone_number(self, value):
+        if value is not None and value.strip() == "":
+            return None
+        return value

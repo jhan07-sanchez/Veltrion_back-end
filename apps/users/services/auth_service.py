@@ -25,7 +25,7 @@ class AuthService:
     """
 
     @staticmethod
-    def login(username: str, password: str) -> LoginResult:
+    def login(email: str, password: str) -> LoginResult:
         """
         Autentica un usuario y genera los tokens JWT.
 
@@ -36,8 +36,8 @@ class AuthService:
             4. Al menos un permiso efectivo.
 
         Args:
-            username:
-                Nombre de usuario.
+            email:
+                Correo electrónico del usuario.
             password:
                 Contraseña del usuario.
 
@@ -56,7 +56,7 @@ class AuthService:
         """
 
         user = authenticate(
-            username=username,
+            email=email,
             password=password,
         )
 

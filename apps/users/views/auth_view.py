@@ -36,7 +36,7 @@ class AuthLoginView(APIView):
         serializer.is_valid(raise_exception=True)
 
         login_result = AuthService.login(
-            username=serializer.validated_data["username"],
+            email=serializer.validated_data["email"],
             password=serializer.validated_data["password"],
         )
 

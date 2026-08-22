@@ -20,7 +20,7 @@ login_schema = extend_schema(
     tags=["Authentication"],
     summary="Iniciar sesión",
     description=(
-        "Autentica un usuario utilizando su nombre de usuario y contraseña. "
+        "Autentica un usuario utilizando su correo electrónico y contraseña. "
         "Si las credenciales son válidas, retorna la información del usuario "
         "junto con un Access Token y un Refresh Token JWT."
     ),
@@ -39,7 +39,7 @@ login_schema = extend_schema(
         ),
         401: OpenApiResponse(
             response=ApiErrorResponseSerializer,
-            description="Usuario o contraseña incorrectos. Código posible: AUTHENTICATION_FAILED.",
+            description="Correo o contraseña incorrectos. Código posible: AUTHENTICATION_FAILED.",
         ),
     },
     examples=[
@@ -47,7 +47,7 @@ login_schema = extend_schema(
             name="Ejemplo de Login Exitoso",
             request_only=True,
             value={
-                "username": "software_veltrion",
+                "email": "usuario1@veltrion.com",
                 "password": "12345678",
             },
         ),

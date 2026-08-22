@@ -10,11 +10,9 @@ User = get_user_model()
 class AuthLoginSerializer(serializers.Serializer):
     """Serializer para validar las credenciales de inicio de sesión."""
 
-    username = serializers.CharField(
-        max_length=150,
+    email = serializers.EmailField(
         required=True,
-        trim_whitespace=True,
-        help_text="Nombre de usuario.",
+        help_text="Correo electrónico.",
     )
 
     password = serializers.CharField(
@@ -25,20 +23,19 @@ class AuthLoginSerializer(serializers.Serializer):
         help_text="Contraseña del usuario.",
     )
 
-    def validate_username(self, value: str) -> str:
-        """Normaliza el nombre de usuario."""
-
+    def validate_email(self, value: str) -> str:
+        """Normaliza el correo electrónico."""
         return value.strip().lower()
 
     def validate(self, attrs: dict) -> dict:
         """Valida que las credenciales hayan sido enviadas."""
 
-        username = attrs.get("username")
+        email = attrs.get("email")
         password = attrs.get("password")
 
-        if not username:
+        if not email:
             raise serializers.ValidationError(
-                {"username": "El nombre de usuario es obligatorio."},
+                {"email": "El correo electrónico es obligatorio."},
             )
 
         if not password:

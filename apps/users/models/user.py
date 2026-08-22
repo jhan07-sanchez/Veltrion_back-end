@@ -32,6 +32,9 @@ class User(AbstractUser, BaseModel):
         help_text="Número telefónico del usuario.",
     )
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
+
     objects = UserManager()
 
     class Meta:
